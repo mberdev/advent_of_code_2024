@@ -1,5 +1,6 @@
 ﻿#include "CMakeProject.h"
-#include "./infrastructure/file_reader.hpp"
+#include "infrastructure/file_reader.hpp"
+#include "input_parser.hpp"
 
 #include <vector>
 #include <filesystem>
@@ -26,55 +27,85 @@ public:
 
 private:
     void processLines(std::vector<std::string>& lines) {
-        auto result = parseStringPairs(lines);
+        auto data = InputParser::parseLines(lines);
 
-        auto list1 = result.first;
-        auto list2 = result.second;
+        auto list1 = data.first;
+        auto list2 = data.second;
 
-        //// Control
-        //for (const auto& item : list1) {
-        //    cout << item << " ";
-        //}
-        //cout << endl;
+        //part1(list1, list2);
+        part2(list1, list2);
+    }
 
-        ////Control
-        //for (const auto& item : list2) {
-        //    cout << item << " ";
-        //}
-        //cout << endl;
-
+    void part1(std::vector<int>& list1, std::vector<int>& list2)
+    {
         std::sort(list1.begin(), list1.end());
         std::sort(list2.begin(), list2.end());
 
         //Control
         cout << "Smallest number in list1 " << list1.front() << endl;
         cout << "Smallest number in list2 " << list2.front() << endl;
-		cout << "Largest number in list1 " << list1.back() << endl;
-		cout << "Largest number in list2 " << list2.back() << endl;
+        cout << "Largest number in list1 " << list1.back() << endl;
+        cout << "Largest number in list2 " << list2.back() << endl;
 
         int totalDistances = 0;
         for (size_t i = 0; i < list1.size(); ++i) {
-            totalDistances += std::abs(list2[i] - list1[i]); // Calculate absolute value
+            totalDistances += std::abs(list2[i] - list1[i]);
         }
 
-		cout << "Total distances: " << totalDistances << endl;
+        cout << "Total distances: " << totalDistances << endl;
     }
 
-    std::pair<std::vector<int>, std::vector<int>> parseStringPairs(const std::vector<std::string>& lines) {
-        std::vector<int> list1;
-        std::vector<int> list2;
+    void part2(std::vector<int>& list1, std::vector<int>& list2)
+    {
+        std::sort(list1.begin(), list1.end());
+        std::sort(list2.begin(), list2.end());
 
-        for (const auto& line : lines) {
-            std::istringstream iss(line);
-            int first, second;
-            iss >> first >> second;
-            list1.push_back(first);
-            list2.push_back(second);
+        //Control
+        cout << "Smallest number in list1 " << list1.front() << endl;
+        cout << "Smallest number in list2 " << list2.front() << endl;
+        cout << "Largest number in list1 " << list1.back() << endl;
+        cout << "Largest number in list2 " << list2.back() << endl;
+
+		cout << "Calculating similarity score... (" << list1.size() << " items)" << endl;
+
+        int similarityScore = 0;
+
+        int i1 = 0;
+        int i2 = 0;
+		while (i1 < list1.size() && i2 < list2.size()) {
+
+            // Skip items that are in left list but not in right list, or vice versa
+            while (i1 < list1.size() && i2 < list2.size() && list1[i1] != list2[i2]) {
+                while (i1 < list1.size() && i2 < list2.size() && list1[i1] < list2[i2]) {
+                    ++i1;
+                }
+				while (i1 < list1.size() && i2 < list2.size() && list1[i1] > list2[i2]) {
+					++i2;
+				}
+            }
+
+            // Item in both lists; count it.
+            int counter = 0;
+            while (i2 < list2.size() && list1[i1] == list2[i2]) {
+                ++counter;
+                ++i2;
+            }
+
+            int  value = (list1[i1] * counter);
+			similarityScore += value;
+
+            // Optimization: Items of left list that might appear several times, no need to compute again.
+            if (i1 < list1.size()) {
+                ++i1;
+            }
+            while (i1 < list1.size() && list1[i1] == list1[i1 - 1]) {
+				similarityScore += value;
+                ++i1;
+            }
         }
 
-		// Apparently, returning by-value in modern C++ is not a problem anymore thanks to RVO. Kids nowadays.
-        return { std::move(list1), std::move(list2) };
-    }
+        cout << "Similarity score: " << similarityScore << endl;
+    }   
 };
 
 int main() {

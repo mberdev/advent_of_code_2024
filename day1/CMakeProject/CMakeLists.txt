@@ -12,7 +12,7 @@ endif()
 project ("CMakeProject")
 
 # Add source to this project's executable.
-add_executable (CMakeProject "CMakeProject.cpp" "CMakeProject.h" "infrastructure/file_reader.cpp")
+add_executable (CMakeProject "CMakeProject.cpp" "CMakeProject.h" "parse_input.cpp" "infrastructure/file_reader.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeProject PROPERTY CXX_STANDARD 20)
