@@ -41,7 +41,7 @@ private:
 				continue;
 			}
 
-            if (isSafeAllPermutations(report)) {
+            if (isSafeAnyModification(report)) {
 				++safeReportsCount;
             }
         }
@@ -49,7 +49,7 @@ private:
         cout << "Safe reports count: " << safeReportsCount << endl;
     }
 
-    bool isSafeAllPermutations(const std::vector<int>& report) {
+    bool isSafeAnyModification(const std::vector<int>& report) {
         // Safe unchanged
         if (isReportSafe(report)) {
             return true;
