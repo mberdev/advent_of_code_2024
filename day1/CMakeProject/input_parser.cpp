@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 std::pair<std::vector<int>, std::vector<int>> InputParser::parseLines(const std::vector<std::string>& lines) {
     std::vector<int> list1;
