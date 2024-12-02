@@ -41,7 +41,7 @@ private:
 				continue;
 			}
 
-            if (isReportSafe(report)) {
+            if (isSafeAllPermutations(report)) {
 				++safeReportsCount;
             }
         }
@@ -49,6 +49,22 @@ private:
         cout << "Safe reports count: " << safeReportsCount << endl;
     }
 
+    bool isSafeAllPermutations(const std::vector<int>& report) {
+        // Safe unchanged
+        if (isReportSafe(report)) {
+            return true;
+        }
+
+        // Safe modified
+        for (int i = 0; i < report.size(); i++) {
+            std::vector<int> modifiedReport = report;
+            modifiedReport.erase(modifiedReport.begin() + i);
+            if (isReportSafe(modifiedReport)) {
+                return true;
+            }
+        }
+        return false;
+    }
     bool isReportSafe(const std::vector<int>& report)
     {
         if (report.size() == 1) {
