@@ -27,32 +27,50 @@ public:
 
 private:
     void processLines(std::vector<std::string>& lines) {
-        auto data = InputParser::parseLines(lines);
+        auto reports = InputParser::parseLines(lines);
 
-        auto list1 = data.first;
-        auto list2 = data.second;
-
-        //part1(list1, list2);
-        part2(list1, list2);
+        part1(reports);
+        //part2(list1, list2);
     }
 
-    void part1(std::vector<int>& list1, std::vector<int>& list2)
+    void part1(std::vector<std::vector<int>>& reports)
     {
-        std::sort(list1.begin(), list1.end());
-        std::sort(list2.begin(), list2.end());
+        int safeReportsCount = 0;
+        for (const auto& report : reports) {
+			if (report.size() == 0) {
+				continue;
+			}
 
-        //Control
-        cout << "Smallest number in list1 " << list1.front() << endl;
-        cout << "Smallest number in list2 " << list2.front() << endl;
-        cout << "Largest number in list1 " << list1.back() << endl;
-        cout << "Largest number in list2 " << list2.back() << endl;
-
-        int totalDistances = 0;
-        for (size_t i = 0; i < list1.size(); ++i) {
-            totalDistances += std::abs(list2[i] - list1[i]);
+            if (isReportSafe(report)) {
+				++safeReportsCount;
+            }
         }
 
-        cout << "Total distances: " << totalDistances << endl;
+        cout << "Safe reports count: " << safeReportsCount << endl;
+    }
+
+    bool isReportSafe(const std::vector<int>& report)
+    {
+        if (report.size() == 1) {
+			return true;
+        }
+
+        int previousValue = report[0];
+		int direction = report[1] - report[0] > 0 ? 1 : -1;
+        for (int i = 1; i < report.size(); i++) {
+			int value = report[i];
+            int step = abs(value - previousValue);
+            if (step < 1 || step > 3) {
+                return false;
+            }
+			int newDirection = value - previousValue > 0 ? 1 : -1;
+			if (newDirection != direction) {
+				return false;
+			}
+			previousValue = value;
+        }
+
+        return true;
     }
 
     void part2(std::vector<int>& list1, std::vector<int>& list2)

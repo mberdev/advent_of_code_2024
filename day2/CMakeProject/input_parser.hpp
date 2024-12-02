@@ -9,7 +9,7 @@ public:
     InputParser();
     ~InputParser();
 
-    static std::pair<std::vector<int>, std::vector<int>> parseLines(const std::vector<std::string>& lines);
+    static std::vector<std::vector<int>> parseLines(const std::vector<std::string>& lines);
 
 };
 
