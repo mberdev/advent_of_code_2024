@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <iostream>
 #include <algorithm>
+#include <regex>
 
 using namespace std;
 
@@ -27,119 +28,39 @@ public:
 
 private:
     void processLines(std::vector<std::string>& lines) {
-        auto reports = InputParser::parseLines(lines);
+        //auto reports = InputParser::parseLines(lines);
 
-        part1(reports);
+        part1(lines);
         //part2(list1, list2);
     }
 
-    void part1(std::vector<std::vector<int>>& reports)
+    void part1(std::vector<std::string>& lines)
     {
-        int safeReportsCount = 0;
-        for (const auto& report : reports) {
-			if (report.size() == 0) {
-				continue;
-			}
+        int total = 0;
 
-            if (isSafeAnyModification(report)) {
-				++safeReportsCount;
-            }
-        }
-
-        cout << "Safe reports count: " << safeReportsCount << endl;
-    }
-
-    bool isSafeAnyModification(const std::vector<int>& report) {
-        // Safe unchanged
-        if (isReportSafe(report)) {
-            return true;
-        }
-
-        // Safe modified
-        for (int i = 0; i < report.size(); i++) {
-            std::vector<int> modifiedReport = report;
-            modifiedReport.erase(modifiedReport.begin() + i);
-            if (isReportSafe(modifiedReport)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    bool isReportSafe(const std::vector<int>& report)
-    {
-        if (report.size() == 1) {
-			return true;
-        }
-
-        int previousValue = report[0];
-		int direction = report[1] - report[0] > 0 ? 1 : -1;
-        for (int i = 1; i < report.size(); i++) {
-			int value = report[i];
-            int step = abs(value - previousValue);
-            if (step < 1 || step > 3) {
-                return false;
-            }
-			int newDirection = value - previousValue > 0 ? 1 : -1;
-			if (newDirection != direction) {
-				return false;
-			}
-			previousValue = value;
-        }
-
-        return true;
-    }
-
-    void part2(std::vector<int>& list1, std::vector<int>& list2)
-    {
-        std::sort(list1.begin(), list1.end());
-        std::sort(list2.begin(), list2.end());
-
-        //Control
-        cout << "Smallest number in list1 " << list1.front() << endl;
-        cout << "Smallest number in list2 " << list2.front() << endl;
-        cout << "Largest number in list1 " << list1.back() << endl;
-        cout << "Largest number in list2 " << list2.back() << endl;
-
-		cout << "Calculating similarity score... (" << list1.size() << " items)" << endl;
-
-        int similarityScore = 0;
-
-        int i1 = 0;
-        int i2 = 0;
-		while (i1 < list1.size() && i2 < list2.size()) {
-
-            // Skip items that are in left list but not in right list, or vice versa
-            while (i1 < list1.size() && i2 < list2.size() && list1[i1] != list2[i2]) {
-                while (i1 < list1.size() && i2 < list2.size() && list1[i1] < list2[i2]) {
-                    ++i1;
+        std::regex re("mul\\((\\d{1,3}),(\\d{1,3})\\)");
+        for (const auto& line : lines) {
+            std::sregex_iterator next(line.begin(), line.end(), re);
+            std::sregex_iterator end;
+            while (next != end) {
+                std::smatch match = *next;
+                if (match.size() == 3) {
+                    int first = std::stoi(match[1].str());
+                    int second = std::stoi(match[2].str());
+                    std::cout << first << "*" << second << "=" << first*second << std::endl;
+					total += first * second;
                 }
-				while (i1 < list1.size() && i2 < list2.size() && list1[i1] > list2[i2]) {
-					++i2;
-				}
-            }
-
-            // Item in both lists; count it.
-            int counter = 0;
-            while (i2 < list2.size() && list1[i1] == list2[i2]) {
-                ++counter;
-                ++i2;
-            }
-
-            int  value = (list1[i1] * counter);
-			similarityScore += value;
-
-            // Optimization: Items of left list that might appear several times, no need to compute again.
-            if (i1 < list1.size()) {
-                ++i1;
-            }
-            while (i1 < list1.size() && list1[i1] == list1[i1 - 1]) {
-				similarityScore += value;
-                ++i1;
+                next++;
             }
         }
 
-        cout << "Similarity score: " << similarityScore << endl;
-    }   
+        std::cout << "TOTAL: " << total << std::endl;
+    }
+
+
+
+    void part2(std::vector<std::string>& lines)
+    {    }   
 };
 
 int main() {
@@ -147,3 +68,4 @@ int main() {
     app.run();
     return 0;
 }
+
