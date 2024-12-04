@@ -1,6 +1,7 @@
 ﻿#include "CMakeProject.h"
 #include "infrastructure/file_reader.hpp"
-#include "input_parser.hpp"
+//#include "input_parser.hpp"
+#include "text_based_grid.hpp"
 
 #include <vector>
 #include <filesystem>
@@ -9,7 +10,7 @@
 #include <regex>
 #include <cassert>
 #include <tuple>
-#include "text_based_grid.hpp"
+#include <string>
 
 using namespace std;
 
@@ -33,48 +34,90 @@ private:
     void processLines(std::vector<std::string>& lines) {
         //auto reports = InputParser::parseLines(lines);
 
-        part1(lines);
-        //part2(lines);
+        //part1(lines);
+        part2(lines);
     }
-
-    #include <string>
-
-    // ...
 
     void part1(std::vector<std::string>& lines)
     {
         auto grid = TextBasedGrid(lines);
         std::string word = "XMAS";
-        cout << "count: " << countWord(grid, word) << endl;
+        cout << "count: " << countWord1(grid, word) << endl;
     }
 
     void part2(std::vector<std::string>& lines) {
- 
+        int total = 0;
+        auto grid = TextBasedGrid(lines);
+
+        std::string word = "MAS";
+        total += countWord2(grid, word);
+
+		cout << "count: " << total << endl;
     }
 
-    int countWord(TextBasedGrid& grid, std::string& word) {
+	//------------------------- PART 2 --------------------------
+    
+    int countWord2(TextBasedGrid& grid, std::string& word) {
+		int DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT = 1;
+		int DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT = 3;
+
+        std::string wordbackwards = std::string(word.rbegin(), word.rend());
+
+        int total = 0;
+        int width = grid.width();
+        int height = grid.height();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+				if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+					&& searchDirection1(grid, word, x+2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+					total++;
+				}
+
+                if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+                    && searchDirection1(grid, word, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+                    total++;
+                }
+
+                if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+                    && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+                    total++;
+                }
+
+                if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+                    && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+                    total++;
+                }
+
+            }
+        }
+        return total;
+    }
+
+
+    //------------------------- PART 1 --------------------------
+    int countWord1(TextBasedGrid& grid, std::string& word) {
 		int total = 0;
         int width = grid.width();
         int height = grid.height();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                total += countWordAt(grid, word, x, y);
+                total += countWordAt1(grid, word, x, y);
             }
         }
 		return total;
     }
 
-    int countWordAt(TextBasedGrid& grid, std::string& word, int x, int y) {
+    int countWordAt1(TextBasedGrid& grid, std::string& word, int x, int y) {
         int count = 0;
 
         for (int direction = 0; direction < 8; direction++) {
-            count += searchDirection(grid, word, x, y, direction) ? 1 : 0;
+            count += searchDirection1(grid, word, x, y, direction) ? 1 : 0;
         }
 
 		return count;        
     }
 
-    bool searchDirection(TextBasedGrid & grid, std::string & word, int x, int y, int direction)
+    bool searchDirection1(TextBasedGrid & grid, std::string & word, int x, int y, int direction)
     {
         int x_step = 0;
         int y_step = 0;
