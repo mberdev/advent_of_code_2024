@@ -58,39 +58,45 @@ private:
 	//------------------------- PART 2 --------------------------
     
     int countWord2(TextBasedGrid& grid, std::string& word) {
-		int DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT = 1;
-		int DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT = 3;
-
-        std::string wordbackwards = std::string(word.rbegin(), word.rend());
 
         int total = 0;
         int width = grid.width();
         int height = grid.height();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-				if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
-					&& searchDirection1(grid, word, x+2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
-					total++;
-				}
-
-                if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
-                    && searchDirection1(grid, word, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
-                    total++;
-                }
-
-                if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
-                    && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
-                    total++;
-                }
-
-                if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
-                    && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
-                    total++;
-                }
-
+                searchCross(word, grid, x, y, total);
             }
         }
         return total;
+    }
+
+    void searchCross(std::string& word, TextBasedGrid& grid, int x, int y, int& total)
+    {
+        int DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT = 1;
+        int DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT = 3;
+
+        std::string wordbackwards = std::string(word.rbegin(), word.rend());
+
+
+        if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+            && searchDirection1(grid, word, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+            total++;
+        }
+
+        if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+            && searchDirection1(grid, word, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+            total++;
+        }
+
+        if (searchDirection1(grid, word, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+            && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+            total++;
+        }
+
+        if (searchDirection1(grid, wordbackwards, x, y, DIRECTON_DIAGONAL_TOPLEFT_TO_BOTTOMRIGHT)
+            && searchDirection1(grid, wordbackwards, x + 2, y, DIRECTON_DIAGONAL_TOPRIGHT_TO_BOTTOMLEFT)) {
+            total++;
+        }
     }
 
 
