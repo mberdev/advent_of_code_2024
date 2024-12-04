@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <regex>
 #include <cassert>
+#include <tuple>
 
 using namespace std;
 
@@ -59,72 +60,44 @@ private:
     }
 
     void part2(std::vector<std::string>& lines) {
-        int total = 0;
         bool enabled = true;
+        int total = 0;
 
-        std::regex re("mul\\((\\d{1,3}),(\\d{1,3})\\)(.*?)(?=mul\\(\\d{1,3},\\d{1,3}\\)|$)");
-        std::regex action_re("(do\\(\\)|don't\\(\\))");
+        regex re("(mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\))");
         for (const auto& line : lines) {
             std::sregex_iterator next(line.begin(), line.end(), re);
             std::sregex_iterator end;
             while (next != end) {
                 std::smatch match = *next;
-                if (match.size() >= 3) {
-                    int first = std::stoi(match[1].str());
-                    int second = std::stoi(match[2].str());
-
-                    if (enabled) {
-                        total += first * second;
+                if (match.size() == 4) {
+                    if (match[0].str() == "do()") {
+                        enabled = true;
+						cout << "do()" << endl;
                     }
+                    else if (match[0].str() == "don't()") {
+                        enabled = false;
+						cout << "don't()" << endl;
+                    }
+                    else {
+                        int first = std::stoi(match[2].str());
+                        int second = std::stoi(match[3].str());
 
-                    std::cout << (enabled ? "" : "/") << first << "*" << second << "=" << first * second << "   (" << total << ")";
+						if (enabled)
+                            total += first * second;
 
-                    if (match.size() > 3) {
-                        std::string following_text = match[3].str();
+                        std::cout << (enabled? "":"/") << first << "*" << second << "=" << first * second << std::endl;
 
-                        std::cout << "      " << following_text;
-
-                        // Iterate over do() and don't()
-                        int counter = 0;
-                        std::sregex_iterator action_next(following_text.begin(), following_text.end(), action_re);
-                        while (action_next != end) {
-                            std::cout << std::endl;
-
-                            std::smatch action_match = *action_next;
-                            std::cout << "   Action: " << action_match.str();
-                            if (action_match.str() == "do()") {
-                                enabled = true;
-                            }
-                            else if (action_match.str() == "don't()") {
-                                enabled = false;
-                            }
-                            counter++;
-                            if (counter > 1) {
-                                assert(false); //DEBUG
-                            }
-                            action_next++;
-                        }
                     }
                 }
-
-				std::cout << std::endl;
-
+                else {
+					throw new std::exception("Invalid line");
+                }
                 next++;
             }
         }
 
         std::cout << "TOTAL: " << total << std::endl;
     }
-
-
-
-
-
-
-
-
-
-
 };
 
 int main() {
@@ -132,3 +105,5 @@ int main() {
     app.run();
     return 0;
 }
+
+
