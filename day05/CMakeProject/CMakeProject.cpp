@@ -12,7 +12,9 @@
 #include <tuple>
 #include <string>
 #include <unordered_map>
+#include <functional>
 #include "input_data/puzzle_data.hpp"
+#include "sorter.hpp"   
 
 using namespace std;
 
@@ -28,8 +30,8 @@ public:
             // Control
 			//puzzleData.print();
 
-			part1(puzzleData);
-			//part2(puzzleData);
+			//part1(puzzleData);
+			part2(puzzleData);
 
             cout << "Done." << endl << endl;
         }
@@ -50,11 +52,6 @@ private:
         for (const auto& update : puzzleData.getUpdates()) {
 
             if (updateFollowsRules(update, collapsedRules)) {
-
-                // Corporate reflex : never trust the data.
-                if (update.size() % 2 == 0) {
-                    throw std::runtime_error("This update doesn't have a 'middle' element.");
-                }
 
                 int middleElement = update[update.size() / 2];
 
@@ -93,10 +90,33 @@ private:
         return true;
     }
 
-	void part2(PuzzleData& puzzleData)
+    void part2(PuzzleData& puzzleData)
     {
-        //cout << "count: " << total << endl;
+        Sorter sorter(puzzleData.getRulesAsSet());
+
+        int total = 0;
+
+        auto collapsedRules = collapseRules(puzzleData.getRules());
+
+
+        for (const auto& update : puzzleData.getUpdates()) {
+
+            if (!updateFollowsRules(update, collapsedRules)) {
+
+                const auto sortedPages = sorter.sort(update);
+
+                int middleElement = sortedPages[sortedPages.size() / 2];
+                cout << middleElement << endl;
+                total += middleElement;
+            }
+            else {
+                cout << "valid update" << endl;
+            }
+        }
+
+        cout << "total: " << total << endl;
     }
+
 
     unordered_map<int, vector<int>> collapseRules(const vector<pair<int, int>>& rules)
     {
