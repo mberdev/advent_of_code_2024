@@ -11,6 +11,7 @@
 #include <cassert>
 #include <tuple>
 #include <string>
+#include "input_data/puzzle_data.hpp"
 
 using namespace std;
 
@@ -18,9 +19,27 @@ class App {
 public:
     void run() {
         try {
-            string inputFilePath = (std::filesystem::current_path() / "input_data" / "input.txt").string();
+            string inputFilePath = (std::filesystem::current_path() / "input_data" / "test_input.txt").string();
             std::vector<std::string> lines = FileReader::readAll(inputFilePath, false);
-            processLines(lines);
+
+            PuzzleData puzzleData(lines);
+
+            // Print rules
+            std::cout << "Rules:" << std::endl;
+            for (const auto& rule : puzzleData.getRules()) {
+                std::cout << rule.first << ", " << rule.second << std::endl;
+            }
+
+            // Print updates
+            std::cout << "Updates:" << std::endl;
+            for (const auto& update : puzzleData.getUpdates()) {
+                for (const auto& number : update) {
+                    std::cout << number << " ";
+                }
+                std::cout << std::endl;
+            }
+
+            //processLines(lines);
             cout << "Done." << endl << endl;
         }
         catch (const std::exception& e) {
