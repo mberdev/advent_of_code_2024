@@ -1,5 +1,6 @@
-#include "puzzle_Data.hpp"
+#include "puzzle_data.hpp"
 #include <sstream>
+#include <iostream>
 
 PuzzleData::PuzzleData(const std::vector<std::string>& lines) {
     bool parsingRules = true;
@@ -32,4 +33,18 @@ PuzzleData::PuzzleData(const std::vector<std::string>& lines) {
             updates.push_back(update);
         }
     }
+}
+
+void PuzzleData::print() const {
+	std::cout << "Rules:" << std::endl;
+	for (const auto& rule : rules) {
+		std::cout << rule.first << ", " << rule.second << std::endl;
+	}
+	std::cout << "Updates:" << std::endl;
+	for (const auto& update : updates) {
+		for (const auto& number : update) {
+			std::cout << number << " ";
+		}
+		std::cout << std::endl;
+	}
 }

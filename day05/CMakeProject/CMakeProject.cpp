@@ -11,6 +11,7 @@
 #include <cassert>
 #include <tuple>
 #include <string>
+#include <unordered_map>
 #include "input_data/puzzle_data.hpp"
 
 using namespace std;
@@ -19,27 +20,17 @@ class App {
 public:
     void run() {
         try {
-            string inputFilePath = (std::filesystem::current_path() / "input_data" / "test_input.txt").string();
+            string inputFilePath = (std::filesystem::current_path() / "input_data" / "input.txt").string();
             std::vector<std::string> lines = FileReader::readAll(inputFilePath, false);
 
             PuzzleData puzzleData(lines);
 
-            // Print rules
-            std::cout << "Rules:" << std::endl;
-            for (const auto& rule : puzzleData.getRules()) {
-                std::cout << rule.first << ", " << rule.second << std::endl;
-            }
+            // Control
+			//puzzleData.print();
 
-            // Print updates
-            std::cout << "Updates:" << std::endl;
-            for (const auto& update : puzzleData.getUpdates()) {
-                for (const auto& number : update) {
-                    std::cout << number << " ";
-                }
-                std::cout << std::endl;
-            }
+			part1(puzzleData);
+			//part2(puzzleData);
 
-            //processLines(lines);
             cout << "Done." << endl << endl;
         }
         catch (const std::exception& e) {
@@ -50,22 +41,70 @@ public:
     }
 
 private:
-    void processLines(std::vector<std::string>& lines) {
-        //auto reports = InputParser::parseLines(lines);
-
-        //part1(lines);
-        part2(lines);
-    }
-
-    void part1(std::vector<std::string>& lines)
+    void part1(PuzzleData& puzzleData)
     {
+        int total = 0;
 
-        //cout << "count: " << countWord1(grid, word) << endl;
+        auto collapsedRules = collapseRules(puzzleData.getRules());
+
+        for (const auto& update : puzzleData.getUpdates()) {
+
+            if (updateFollowsRules(update, collapsedRules)) {
+
+                // Corporate reflex : never trust the data.
+                if (update.size() % 2 == 0) {
+                    throw std::runtime_error("This update doesn't have a 'middle' element.");
+                }
+
+                int middleElement = update[update.size() / 2];
+
+                cout << middleElement << endl;
+
+				total += middleElement;
+
+            }
+            else {
+                cout << "invalid update" << endl;
+            }
+        }
+
+        cout << "total: " << total << endl;
     }
 
-    void part2(std::vector<std::string>& lines) {
+    bool updateFollowsRules(const std::vector<int>& update, const unordered_map<int, vector<int>>& collapsedRules)
+    {
+        for (int page = 0; page < update.size(); ++page) {
+            if (collapsedRules.find(update[page]) == collapsedRules.end()) {
+                // No rules for this page
+                continue;
+            }
 
+            const auto& pagesThatMustComeAfterThisPage = collapsedRules.at(update[page]);
+
+            std::vector<int> pagesBeforeThisPage(update.begin(), update.begin() + page);
+
+            // check if there's a page in both vectors, i.e. a page which breaks the rule.
+            for (const auto& pageBeforeThisPage : pagesBeforeThisPage) {
+                if (std::find(pagesThatMustComeAfterThisPage.begin(), pagesThatMustComeAfterThisPage.end(), pageBeforeThisPage) != pagesThatMustComeAfterThisPage.end()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+	void part2(PuzzleData& puzzleData)
+    {
         //cout << "count: " << total << endl;
+    }
+
+    unordered_map<int, vector<int>> collapseRules(const vector<pair<int, int>>& rules)
+    {
+        unordered_map<int, vector<int>> collapsedRules;
+        for (const auto& [left, right] : rules) {
+            collapsedRules[left].push_back(right);
+        }
+        return collapsedRules;
     }
 };
 
