@@ -11,6 +11,7 @@
 #include <tuple>
 #include <string>
 #include "text_based_grid.hpp"
+#include <unordered_set>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ public:
 private:
     void processLines(std::vector<std::string>& lines) {
 
-        int startX = -1; int startY =-1;
+        int startX = -1; int startY = -1;
 
         for (int y = 0; y < lines.size(); ++y) {
             size_t x = lines[y].find('^');
@@ -44,60 +45,135 @@ private:
             }
         }
 
-		if (startX == -1 || startY == -1) {
-			throw std::invalid_argument("No start position found");
-		}
+        if (startX == -1 || startY == -1) {
+            throw std::invalid_argument("No start position found");
+        }
 
         auto grid = TextBasedGrid(lines);
-		grid.setAt(startX, startY, '.');
 
-        auto start = Position(startX, startY);
-        //auto reports = InputParser::parseLines(lines);
+        grid.setAt(startX, startY, '.');
 
-        part1(grid, start);
+        auto start = GuardState(Position(startX, startY), UP);
 
-        //part2(lines);
+        //auto result = part1(grid, start);
+
+        part2(grid, start);
     }
 
-    void part1(TextBasedGrid& grid, Position& start) {
-        Position pos = start;
+    std::vector<GuardState> part1(TextBasedGrid& grid, GuardState& start) {
+        std::vector<GuardState> result;
+
+		GuardState pos = start;
 
         int xCount = 1;
-        Direction direction = Direction::UP;
-		grid.setAt(pos.x, pos.y, 'X');
+        grid.setAt(pos, 'X');
+		result.push_back(pos);
+
         while (true) {
-            Position candidate = pos.targetPosition(direction);
+            Position candidate = pos.inFront();
             if (!grid.isInGrid(candidate)) {
                 break;
             }
 
-            if (grid.getAt(candidate.x, candidate.y) == '.') {
+            if (grid.getAt(candidate) == '.') {
                 xCount++;
-                pos = candidate;
-                grid.setAt(pos.x, pos.y, 'X');
+                pos = GuardState(candidate, pos.direction);
+                grid.setAt(pos, 'X');
             }
-            else if (grid.getAt(candidate.x, candidate.y) == 'X') {
-                pos = candidate;
+            else if (grid.getAt(candidate) == 'X') {
+                pos = GuardState(candidate, pos.direction);
             }
-            else if (grid.getAt(candidate.x, candidate.y) == '#') {
-                direction = turnRight(direction);
+            else if (grid.getAt(candidate) == '#') {
+				pos = GuardState(pos.pos, turnClockwise(pos.direction));
             }
+
+            result.push_back(pos);
+
         }
 
-		cout << "Part 1: " << xCount << endl;
+        cout << "Part 1: " << xCount << endl;
+
+        return result;
     }
 
-    Direction turnRight(Direction direction) {
-        switch (direction) {
-        case Direction::UP:
-            return Direction::RIGHT;
-        case Direction::RIGHT:
-            return Direction::DOWN;
-        case Direction::DOWN:
-            return Direction::LEFT;
-        case Direction::LEFT:
-            return Direction::UP;
-        };
+
+    void part2(TextBasedGrid& grid, GuardState& start) {
+		int loopCount = 0;
+        int movesCount = 0;
+        std::unordered_set<GuardState> visited;
+		visited.insert(start);
+
+        GuardState pos = start;
+
+        while (true) {
+            Position candidate = pos.inFront();
+
+            // Guard exits grid
+            if (!grid.isInGrid(candidate)) {
+                break;
+            }
+
+            // Regular obstacle
+            if (grid.getAt(candidate) == '#') {
+                pos = GuardState(pos.pos, turnClockwise(pos.direction));
+				visited.insert(pos);
+            }
+
+            // Simulated obstacle
+            else {
+				TextBasedGrid gridCopy = grid;
+				gridCopy.setAt(candidate, '#');
+
+                if (searchLoop(gridCopy, pos, visited)) {
+					cout << "Position " << pos.toString() << " has a loop." << endl;
+					loopCount++;
+                }
+
+                // Eventually, still move guard.
+				pos = GuardState(candidate, pos.direction);
+				visited.insert(pos);
+            }
+
+            movesCount++;
+        }
+
+        cout << "Part 2: " << loopCount << endl;
+
+    }
+
+    bool searchLoop(TextBasedGrid& grid, GuardState& start, const std::unordered_set<GuardState>& visited) {
+        unordered_set<GuardState> visitedCopy = visited;
+
+        GuardState pos = start;
+        pos = GuardState(pos.pos, turnClockwise(pos.direction));
+        visitedCopy.insert(pos);
+
+        Position candidate = pos.inFront();
+
+        while (true) {
+            
+            if (!grid.isInGrid(candidate)) {
+                return false;
+            }
+            
+            if (grid.getAt(candidate) == '#') {
+                pos = GuardState(pos.pos, turnClockwise(pos.direction));
+            }
+            else {
+                pos = GuardState(candidate, pos.direction);
+            }
+
+            if (visitedCopy.find(pos) != visitedCopy.end()) {
+                // Already visited => it's a loop
+                return true;
+            }
+
+            visitedCopy.insert(pos);
+
+            candidate = pos.inFront();
+        }
+
+        cout << "found loop" << endl;
     }
 };
 
@@ -106,3 +182,6 @@ int main() {
     app.run();
     return 0;
 }
+
+
+

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TEXT_BASED_GRID_HPP
+#define TEXT_BASED_GRID_HPP
+
 #include <vector>
 #include <string>
 
@@ -8,6 +10,8 @@ enum Direction {
     LEFT,
     RIGHT
 };
+
+Direction turnClockwise(Direction direction);
 
 class Position {
 public:
@@ -22,7 +26,7 @@ public:
         return !(*this == other);
     }
 
-    Position targetPosition(Direction direction) const {
+    Position inFront(Direction direction) const {
         switch (direction) {
             case UP:
                 return Position(x, y - 1);
@@ -38,13 +42,61 @@ public:
     }
 };
 
+class GuardState {
+public:
+    Position pos;
+    Direction direction;
+
+    GuardState(Position pos, Direction direction) : pos(pos), direction(direction) {}
+
+    bool operator==(const GuardState& other) const {
+        return pos == other.pos && direction == other.direction;
+    }
+    bool operator!=(const GuardState& other) const {
+        return !(*this == other);
+    };
+
+
+	Position inFront() const { return pos.inFront(direction); }
+
+	GuardState turnRight() const {
+		return GuardState(pos, turnClockwise(direction));
+	}
+
+    
+	std::string toString() const {
+		return "(" + std::to_string(pos.x) + "," + std::to_string(pos.y) + ") " + std::to_string(direction);
+	}
+
+};
+
+// to be able to use GuardState in an unordered_set
+struct GuardStateHash {
+    std::size_t operator()(const GuardState& gs) const {
+        return std::hash<int>()(gs.pos.x) ^ std::hash<int>()(gs.pos.y) ^ std::hash<int>()(gs.direction);
+    }
+};
+
+namespace std {
+    template <>
+    struct hash<GuardState> {
+        std::size_t operator()(const GuardState& gs) const {
+            return GuardStateHash()(gs);
+        }
+    };
+}
 
 class TextBasedGrid {
 public:
     TextBasedGrid(const std::vector<std::string>& lines) : lines(lines) {}
 
     char getAt(int x, int y) const;
+    char getAt(Position pos) const { return getAt(pos.x, pos.y); };
+    char getAt(GuardState pos) const { return getAt(pos.pos); };
+
     void setAt(int x, int y, char c);
+	void setAt(Position pos, char c) { setAt(pos.x, pos.y, c); }
+    void setAt(GuardState pos, char c) { setAt(pos.pos, c); }
 
     int width();
     int height();
@@ -55,3 +107,5 @@ public:
 private:
     std::vector<std::string> lines;
 };
+
+#endif
