@@ -172,8 +172,6 @@ private:
 
             candidate = pos.inFront();
         }
-
-        cout << "found loop" << endl;
     }
 };
 
