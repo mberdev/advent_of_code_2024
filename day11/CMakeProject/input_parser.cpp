@@ -6,17 +6,18 @@
 #include <iostream>
 #include <sstream>
 
-std::vector<std::vector<int>> InputParser::parseLines(const std::vector<std::string>& lines) {
-    std::vector<std::vector<int>> result;
+std::vector<int> InputParser::parseLines(const std::vector<std::string>& lines) {
+    std::vector<int> result;
 
     for (const auto& line : lines) {
-        std::istringstream iss(line);
-        std::vector<int> numbers;
-        int number;
-        while (iss >> number) {
-            numbers.push_back(number);
+        if (!line.empty()) {
+            std::istringstream iss(line);
+            int number;
+            while (iss >> number) {
+                result.push_back(number);
+            }
+            break; // Only parse the first non-empty line
         }
-        result.push_back(numbers);
     }
 
     return result;

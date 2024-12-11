@@ -6,10 +6,8 @@
 
 class InputParser {
 public:
-    InputParser();
-    ~InputParser();
 
-    static std::vector<std::vector<int>> parseLines(const std::vector<std::string>& lines);
+    static std::vector<int> parseLines(const std::vector<std::string>& lines);
 
 };
 

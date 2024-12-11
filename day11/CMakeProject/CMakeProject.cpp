@@ -1,7 +1,6 @@
 ﻿#include "CMakeProject.h"
 #include "infrastructure/file_reader.hpp"
-//#include "input_parser.hpp"
-#include "text_based_grid.hpp"
+#include "input_parser.hpp"
 
 #include <vector>
 #include <filesystem>
@@ -32,7 +31,12 @@ public:
 
 private:
     void processLines(std::vector<std::string>& lines) {
-        //auto reports = InputParser::parseLines(lines);
+        auto numbers = InputParser::parseLines(lines);
+
+        // Control
+        for (const auto& number : numbers) {
+            cout << number << endl;
+        }
 
         part1(lines);
         //part2(lines);
