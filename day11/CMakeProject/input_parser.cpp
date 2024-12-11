@@ -6,8 +6,8 @@
 #include <iostream>
 #include <sstream>
 
-std::vector<int> InputParser::parseLines(const std::vector<std::string>& lines) {
-    std::vector<int> result;
+std::vector<int64_t> InputParser::parseLines(const std::vector<std::string>& lines) {
+    std::vector<int64_t> result;
 
     for (const auto& line : lines) {
         if (!line.empty()) {

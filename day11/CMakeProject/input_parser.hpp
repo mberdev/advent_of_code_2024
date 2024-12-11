@@ -7,7 +7,7 @@
 class InputParser {
 public:
 
-    static std::vector<int> parseLines(const std::vector<std::string>& lines);
+    static std::vector<int64_t> parseLines(const std::vector<std::string>& lines);
 
 };
 
