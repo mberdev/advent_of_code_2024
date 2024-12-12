@@ -12,7 +12,8 @@ var lines = InputParser.ParseInput("./input_data/input.txt");
 
 var grid = new TextBasedGrid(lines);
 
-part1(grid);
+//part1(grid);
+part2(grid);
 
 Console.WriteLine("Done.");
 
@@ -40,6 +41,42 @@ static void part1(TextBasedGrid grid)
             regionFences += RegionHelperPart1.countVerticalFences(regionPlots);
 
             price += regionPlots.Count * regionFences;
+            //Console.WriteLine($"Region at {p} has {regionPlots.Count} plots and {regionFences} fences.");
+
+            //regions.Add(regionPlots);
+        }
+    }
+
+    //Console.WriteLine($"There are {regions.Count} regions.");
+
+    Console.WriteLine($"The price is {price}.");
+}
+
+
+static void part2(TextBasedGrid grid)
+{
+
+    //List<Queue<Position>> regions = new List<Queue<Position>>();
+
+    int price = 0;
+
+    for (int y = 0; y < grid.Height; y++)
+    {
+        for (int x = 0; x < grid.Width; x++)
+        {
+            Position p = new Position(x, y);
+            if (grid.GetAt(p) == ' ')
+            {
+                continue;
+            }
+
+            var regionPlots = grid.floodFill(new Position(x, y), ' ');
+
+            int regionSides = 0;
+            regionSides += RegionHelperPart2.Horizontal.countHorizontalSidesInRegion(regionPlots);
+            regionSides += RegionHelperPart2.Vertical.countVerticalSidesInRegion(regionPlots);
+
+            price += regionPlots.Count * regionSides;
             //Console.WriteLine($"Region at {p} has {regionPlots.Count} plots and {regionFences} fences.");
 
             //regions.Add(regionPlots);
