@@ -15,6 +15,8 @@
 #include <functional>
 #include "input_data/puzzle_data.hpp"
 #include "sorter.hpp"   
+#include "text_based_grid.hpp"
+#include "region.hpp"
 
 using namespace std;
 
@@ -22,16 +24,16 @@ class App {
 public:
     void run() {
         try {
-            string inputFilePath = (std::filesystem::current_path() / "input_data" / "test_input1.txt").string();
+            string inputFilePath = (std::filesystem::current_path() / "input_data" / "test_input2.txt").string();
             std::vector<std::string> lines = FileReader::readAll(inputFilePath, false);
 
-            PuzzleData puzzleData(lines);
+            TextBasedGrid grid(lines);
 
             // Control
 			//puzzleData.print();
 
-			//part1(puzzleData);
-			part2(puzzleData);
+			part1(grid);
+			//part2(puzzleData);
 
             cout << "Done." << endl << endl;
         }
@@ -43,29 +45,28 @@ public:
     }
 
 private:
-    void part1(PuzzleData& puzzleData)
+    void part1(TextBasedGrid& grid)
     {
-        int total = 0;
+        int edgesCount = 0;
+        int regionsCount = 0;
 
-        auto collapsedRules = collapseRules(puzzleData.getRules());
+        Position candidate = grid.findNonEmpty();
+        while (grid.isInGrid(candidate)) {
+            regionsCount++;
+            std::vector<Position> regionPlots = grid.floodFill(candidate, EMPTY_CHAR);
 
-        for (const auto& update : puzzleData.getUpdates()) {
+            EdgesCounter ec(regionPlots);
+			int regionEdges = ec.countEdges();
 
-            if (updateFollowsRules(update, collapsedRules)) {
+			cout << "Region plots: " << regionPlots.size() << endl;
+			cout << " Region edges: " << regionEdges << endl;
+			cout << endl;
 
-                int middleElement = update[update.size() / 2];
-
-                cout << middleElement << endl;
-
-				total += middleElement;
-
-            }
-            else {
-                cout << "invalid update" << endl;
-            }
+            candidate = grid.findNonEmpty();
         }
 
-        cout << "total: " << total << endl;
+        cout << "regions: " << regionsCount << endl;
+		cout << "edges: " << edgesCount << endl;
     }
 
     bool updateFollowsRules(const std::vector<int>& update, const unordered_map<int, vector<int>>& collapsedRules)
