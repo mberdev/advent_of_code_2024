@@ -12,20 +12,18 @@ var lines = InputParser.ParseInput("./input_data/input.txt");
 
 var grid = new IntBasedGrid(lines);
 
-part1(grid);
-//part2(grid);
+//part1(grid);
+part2(grid);
 
 Console.WriteLine("Done.");
 
 static void part1(IntBasedGrid grid)
 {
-    var explorer = new Explorer(grid);
-
-    System.Console.WriteLine("All trails scores sum: " + explorer.FindTrailsAndTheirScores());
+    new Explorer(grid).FindTrailsAndTheirScores();
 }
 
-static void part2(TextBasedGrid grid)
+static void part2(IntBasedGrid grid)
 {
-
+    new Explorer(grid).FindTrailsAndTheirScores();
 }
 
