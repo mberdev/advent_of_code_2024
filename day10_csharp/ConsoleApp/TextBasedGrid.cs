@@ -45,45 +45,5 @@ namespace ConsoleApp
         {
             SetAt(position.X, position.Y, value);
         }
-
-        public Queue<Position> floodFill(Position p, char newColor)
-        {
-            char colorToReplace = GetAt(p);
-
-            if (colorToReplace == newColor)
-                throw new Exception("Already floodfilled");
-
-            Queue<Position> queue = new Queue<Position>();
-            Queue<Position> filled = new Queue<Position>();
-            queue.Enqueue(p);
-
-            while (queue.Count > 0)
-            {
-                Position current = queue.Dequeue();
-                if (GetAt(current) == colorToReplace)
-                {
-                    filled.Enqueue(current);
-                    SetAt(current, newColor);
-
-                    var positionsAround = new List<Position>
-                    {
-                        new Position(current.X + 1, current.Y),
-                        new Position(current.X - 1, current.Y),
-                        new Position(current.X, current.Y + 1),
-                        new Position(current.X, current.Y - 1)
-                    };
-
-                    foreach (var direction in positionsAround)
-                    {
-                        if (GetAt(direction) == colorToReplace)
-                        {
-                            queue.Enqueue(direction);
-                        }
-                    }
-                }
-            }
-
-            return filled;
-        }
     }
 }

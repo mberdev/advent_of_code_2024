@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using ConsoleApp;
 
-var lines = InputParser.ParseInput("./input_data/test_input.txt");
+var lines = InputParser.ParseInput("./input_data/input.txt");
 
 // Control
 //foreach (var line in lines)
@@ -10,23 +10,22 @@ var lines = InputParser.ParseInput("./input_data/test_input.txt");
 //    Console.WriteLine(line);
 //}
 
-var grid = new TextBasedGrid(lines);
+var grid = new IntBasedGrid(lines);
 
-//part1(grid);
-part2(grid);
+part1(grid);
+//part2(grid);
 
 Console.WriteLine("Done.");
 
-static void part1(TextBasedGrid grid)
+static void part1(IntBasedGrid grid)
 {
+    var explorer = new Explorer(grid);
 
+    System.Console.WriteLine("All trails scores sum: " + explorer.FindTrailsAndTheirScores());
 }
-
 
 static void part2(TextBasedGrid grid)
 {
 
-    }
-
-    //Console.WriteLine($"There are {regions.Count} regions.");
 }
+
