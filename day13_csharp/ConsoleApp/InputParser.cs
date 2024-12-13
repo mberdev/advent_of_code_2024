@@ -85,7 +85,6 @@ namespace ConsoleApp
 
             var data =  new Data { Machines = machines.ToArray() };
             
-            Console.WriteLine(data);
             return data;
         }
     }
