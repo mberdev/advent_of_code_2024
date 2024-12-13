@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using ConsoleApp;
 
 
-var filePath = "./input_data/input.txt";
+var filePath = "./input_data/test_input1.txt";
 string[] lines;
 if (File.Exists(filePath))
 {
@@ -22,20 +22,16 @@ var data = InputParser.ParseInput(lines);
 //    Console.WriteLine(line);
 //}
 
-var grid = new IntBasedGrid(lines);
-
-//part1(grid);
-part2(grid);
+part1();
+//part2(grid);
 
 Console.WriteLine("Done.");
 
-static void part1(IntBasedGrid grid)
+static void part1()
 {
-    new Explorer(grid).FindTrailsAndTheirScores();
 }
 
-static void part2(IntBasedGrid grid)
+static void part2()
 {
-    new Explorer(grid).FindTrailsAndTheirScores();
 }
 

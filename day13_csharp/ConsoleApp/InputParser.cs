@@ -11,7 +11,7 @@ namespace ConsoleApp
         public static Button parse(int price, string button)
         {
             var parts = button.Split(' ');
-            return new Button(price, int.Parse(parts[2].Replace("X+", "")), int.Parse(parts[3].Replace("Y+", "")));
+            return new Button(price, int.Parse(parts[2].Replace("X+", "").Replace(",", "")), int.Parse(parts[3].Replace("Y+", "")));
         }
 
         public override string ToString()
@@ -25,7 +25,7 @@ namespace ConsoleApp
         public static Prize parse(string prize)
         {
             var parts = prize.Split(' ');
-            return new Prize(new Position(int.Parse(parts[1].Replace("X=", "")), int.Parse(parts[2].Replace("Y=", ""))));
+            return new Prize(new Position(int.Parse(parts[1].Replace("X=", "").Replace(",", "")), int.Parse(parts[2].Replace("Y=", ""))));
         }
 
         public override string ToString()
@@ -48,6 +48,12 @@ namespace ConsoleApp
     public class Data
     {
         public Machine[] Machines { get; init; } = new Machine[0];
+
+        public override string ToString()
+        {
+
+            return string.Join("\n", Machines.ToList());
+        }
     }
 
     public class InputParser
