@@ -3,13 +3,13 @@ namespace ConsoleApp
 {
     public class EquationSolver2
     {
-        public static Tuple<int, int>? Solve(
+        public static Tuple<long, long>? Solve(
             int AX,
             int BX,
             int AY,
             int BY,
-            int TX,
-            int TY
+            long TX,
+            long TY
         )
         {
             double dAX = AX;
@@ -26,21 +26,27 @@ namespace ConsoleApp
             Console.WriteLine("A :" + A + " B: " + B);
 
             // possible int solution
-            int nearestA = (int)Math.Round(A);
-            int nearestB = (int)Math.Round(B);
+            long nearestA = (long)Math.Round(A);
+            long nearestB = (long)Math.Round(B);
 
+            if (nearestA < 0 || nearestB < 0)
+            {
+                return null;
+
+            }
 
             //try the solution
-            if (TX != nearestA * AX + nearestB * BX || TY != nearestA * AY + nearestB * BY)
+            if (TX != (nearestA * AX + nearestB * BX) || TY != (nearestA * AY + nearestB * BY))
             {
                 return null;
             }
 
+
             //business rule : no more than 100 times per button
-            if (nearestA <0 || nearestA > 100 || nearestB < 0 || nearestB > 100)
-            {
-                return null;
-            }
+            //if (nearestA > 100 || nearestB > 100)
+            //{
+            //    return null;
+            //}
 
 
             return Tuple.Create(nearestA, nearestB);

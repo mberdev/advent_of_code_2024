@@ -21,4 +21,19 @@ namespace ConsoleApp
             return $"({X}, {Y})";
         }
     }
+
+    public record LongPosition
+    {
+        public LongPosition(long x, long y)
+        {
+            X = x;
+            Y = y;
+        }
+        public long X { get; }
+        public long Y { get; }
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
+        }
+    }
 }
