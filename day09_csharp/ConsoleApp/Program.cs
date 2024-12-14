@@ -82,8 +82,10 @@ static void part1(int[] data)
                 Print(PRINT_DEBUG, "Gap at " + sourcePos + " has size " + gapSize + ". Nothing to fill.");
             }
             
+            //fill the gap
             while (targetPos < targetEnd)
             {
+                //we ran out of material to fill the gap. Let's refill.
                 if (buffer.Count == 0)
                 {
                     int endDataSize = 0;
@@ -120,7 +122,7 @@ static void part1(int[] data)
                     }
                 }
 
-                //the buffer is empty because we have reached the "middle" of the file.
+                //the buffer is empty because we have reached the "middle" of the file while trying to refill.
                 if(buffer.Count == 0)
                 {
                     break;
