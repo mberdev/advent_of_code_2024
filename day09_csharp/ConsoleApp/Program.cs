@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using ConsoleApp;
 
 
+
 var filePath = "./input_data/input.txt";
 string[] lines;
 if (File.Exists(filePath))
@@ -16,7 +17,7 @@ else
 
 
 char[] cdata = lines[0].ToCharArray();
-int[] data = Enumerable.Range(0, cdata.Length).ToArray().Select(i => (int)cdata[i]).ToArray();
+int[] data = Enumerable.Range(0, cdata.Length).ToArray().Select(i => (int)(cdata[i]-'0')).ToArray();
 
 
 // Control
@@ -28,8 +29,11 @@ part1(data);
 
 Console.WriteLine("Done.");
 
+
 static void part1(int[] data)
 {
+    bool PRINT_DEBUG = false;
+
     int LENGTH = data.Length;
 
     //algorithm needs odd number of compressed blocks
@@ -49,11 +53,19 @@ static void part1(int[] data)
         // non-gap
         if (sourcePos % 2 == 0)
         {
-            int fileID = (sourcePos / 2) % 10;
+            int fileID = (sourcePos / 2) /* % 10 */;
             int size = data[sourcePos];
             int targetEnd = targetPos + size;
+
+            if (size > 0) {
+                Print(PRINT_DEBUG, "Block at " + sourcePos + " has size " + size + ". Will unpack value " + fileID + " into positions " + targetPos + "-" + (targetEnd - 1));
+            }
+            else {
+                Print(PRINT_DEBUG, "Block at " + sourcePos + " has size " + size + ". Nothing to unpack.");
+            }
             while (targetPos < targetEnd)
             {
+                Print(PRINT_DEBUG, targetPos + "*" + fileID);
                 checksum += targetPos * fileID;
                 targetPos++;
             }
@@ -64,32 +76,60 @@ static void part1(int[] data)
         {
             int gapSize = data[sourcePos];
             int targetEnd = targetPos + gapSize;
+            if (gapSize > 0) {
+                Print(PRINT_DEBUG, "Gap at " + sourcePos + " has size " + gapSize + ". Will fill positions " + targetPos + "-" + (targetEnd - 1));
+            } else {
+                Print(PRINT_DEBUG, "Gap at " + sourcePos + " has size " + gapSize + ". Nothing to fill.");
+            }
+            
             while (targetPos < targetEnd)
             {
                 if (buffer.Count == 0)
                 {
-                    //look at end of file
-                    int lastFilePos = dataLength - 1;
-                    //if file currently ends on a gap, remove it
-                    if (lastFilePos % 2 == 1)
+                    int endDataSize = 0;
+                    while(endDataSize == 0) //In case the file ends on an empty block
                     {
-                        lastFilePos--;
-                        dataLength--;
-                    }
-                    // unpack non-gap data into queue
-                    int endFileID = (lastFilePos / 2) % 10;
-                    int dataSize = data[lastFilePos];
+                        //if file currently ends on a gap, remove it
+                        if ((dataLength-1) % 2 == 1)
+                        {
+                            dataLength--;
+                        }
 
-                    for (int i = 0; i < dataSize; i++)
-                    {
-                        buffer.Enqueue(endFileID);
+                        //if we have reached the "middle" of the file.
+                        if (dataLength<=sourcePos)
+                        {
+                            break;
+                        }
+
+                        // unpack non-gap data into queue
+                        int endFileID = ((dataLength-1) / 2) /* % 10 */;
+                        endDataSize = data[dataLength-1];
+
+                        // Can be zero!
+                        for (int i = 0; i < endDataSize; i++)
+                        {
+                            buffer.Enqueue(endFileID);
+                        }
+                        dataLength--;
+
+                        //if we have reached the "middle" of the file.
+                        if (dataLength <= sourcePos)
+                        {
+                            break;
+                        }
                     }
-                    lastFilePos--;
-                    dataLength--;
+                }
+
+                //the buffer is empty because we have reached the "middle" of the file.
+                if(buffer.Count == 0)
+                {
+                    break;
                 }
 
                 //take a value, put it into the gap
                 int movedFileID = buffer.Dequeue();
+
+                Print(PRINT_DEBUG, targetPos + "*" + movedFileID);
 
                 checksum += targetPos * movedFileID;
                 targetPos++;
@@ -97,6 +137,26 @@ static void part1(int[] data)
         }
 
         sourcePos++;
+    }
+
+    //If there's still some in the buffer, purge the remainder
+    while (buffer.Count > 0)
+    {
+        int movedFileID = buffer.Dequeue();
+        Print(PRINT_DEBUG, targetPos + "*" + movedFileID);
+        checksum += targetPos * movedFileID;
+        targetPos++;
+    }
+
+
+    Console.WriteLine("Checksum: " + checksum);
+}
+
+static void Print(bool print, string s)
+{
+    if (print)
+    {
+        Console.WriteLine(s);
     }
 }
 
