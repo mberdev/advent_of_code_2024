@@ -1,14 +1,15 @@
 ﻿
 using System.Collections.Immutable;
+using System.Security.Cryptography.X509Certificates;
 using ConsoleApp;
-
+using File = ConsoleApp.File;
 
 
 var filePath = "./input_data/input.txt";
 string[] lines;
-if (File.Exists(filePath))
+if (System.IO.File.Exists(filePath))
 {
-    lines = File.ReadAllLines(filePath);
+    lines = System.IO.File.ReadAllLines(filePath);
 }
 else
 {
@@ -24,8 +25,8 @@ int[] data = Enumerable.Range(0, cdata.Length).ToArray().Select(i => (int)(cdata
 //Console.WriteLine(data);
 
 
-part1(data);
-//part2(data);
+//part1(data);
+part2(data);
 
 Console.WriteLine("Done.");
 
@@ -66,7 +67,10 @@ static void part1(int[] data)
             while (targetPos < targetEnd)
             {
                 Print(PRINT_DEBUG, targetPos + "*" + fileID);
-                checksum += targetPos * fileID;
+                long increment = targetPos * fileID;
+                if (long.MaxValue - increment >= checksum)
+                    Console.WriteLine("Overflow");
+                checksum += increment;
                 targetPos++;
             }
 
@@ -162,3 +166,124 @@ static void Print(bool print, string s)
     }
 }
 
+// For part 2 I got lazy and didn't care about a smart in-place solution.
+// Immutable objects and duplication all the way, baby.
+static void part2(int[] iData)
+{
+    List<Item> output = new();
+
+    var input = InputParser.ParseInput(iData);
+
+    var unpacked = Rearrange(input);
+
+    //PrintUnpacked(unpacked);
+    long checksum = 0;
+    int blockPosition = 0;
+    foreach(var item in unpacked)
+    {
+        if (item.IsGap)
+        {
+            blockPosition += item.Gap.Size;
+            continue;
+        }
+
+        for (int i=0; i < item.File.Size; i++)
+        {
+            long increment = blockPosition * item.File.ID;
+            if (long.MaxValue - increment <= checksum)
+                Console.WriteLine("Overflow");
+            checksum += increment;
+            blockPosition++;
+        }
+    }
+
+    Console.WriteLine("Checksum: " + checksum);
+
+}
+
+static void PrintUnpacked(List<Item> unpacked)
+{
+    foreach (var item in unpacked)
+    {
+        if (item.IsGap)
+        {
+            Console.Write(new string('.', item.Gap.Size));
+        }
+        else
+        {
+            char c = (char)((item.File.ID % 10) + '0');
+            Console.Write(new string(c, item.File.Size));
+        }
+    }
+    Console.WriteLine();
+}
+
+static List<Item> Rearrange(List<Item> input)
+{
+    //PrintUnpacked(input);
+
+    //iterate right to left
+    int processed = 0;
+    while(processed < input.Count)
+    {
+        int i = input.Count - 1 - processed;
+        var item = input[i];
+        if (item.IsGap)
+        {
+            processed++;
+            continue;
+        }
+
+        if (!item.IsFile)
+            throw new Exception("Invalid input");
+
+        if(item.File.Moved)
+        {
+            processed++;
+            continue;
+        }
+
+        //find gap to fit this file (iterate left to right)
+        for (int j = 0; j<i; j++)
+        {
+            var item2 = input[j];
+            if(item2.IsGap && item2.Gap.Size >= item.File.Size)
+            {
+                int newGapSize = item2.Gap.Size - item.File.Size;
+
+                //Console.WriteLine("Moving file " + item.File.ID + " of size " + item.File.Size + " from position " + i + " to position " + j + " into gap of size" + item2.Gap.Size + ".");
+                input.RemoveAt(i);
+                input.Insert(i, new Item(new Gap { Size = item.File.Size }));
+
+                input.RemoveAt(j);
+                input.Insert(j, item);
+                item.File.Moved = true;
+
+                if (newGapSize > 0)
+                {
+                    input.Insert(j + 1, new Item(new Gap() { Size = newGapSize }));
+                }
+                j = i; // exit loop
+            }
+        }
+
+        processed++;
+        //PrintUnpacked(input);
+    }
+
+    return input;
+}
+
+static ConsoleApp.File? FindAndRemoveFile(List<Item> items, int size)
+{
+    for (int i = items.Count - 1; i >= 0; i--)
+    {
+        var item = items[i];
+        if(item.IsFile && item.File.Size == size)
+        {
+            items.RemoveAt(i);
+            return item.File;
+        }
+    }
+    return null;
+}
