@@ -2,7 +2,7 @@
 using ConsoleApp;
 
 
-var filePath = "./input_data/test_input1.txt";
+var filePath = "./input_data/input.txt";
 string[] lines;
 if (System.IO.File.Exists(filePath))
 {
@@ -46,7 +46,7 @@ Console.WriteLine("Done.");
 
 static void part1(LongBasedGrid grid, Position start, Position end)
 {
-    bool PRINT = true;
+    bool PRINT = false;
 
     long score = exploreRecursive(grid, new PositionState(start, Direction.Right), end, 0, PRINT);
 
@@ -57,6 +57,11 @@ static long exploreRecursive(LongBasedGrid grid, PositionState current, Position
 {
     Print(PRINT, "Exploring: " + current);
 
+    if(!grid.IsInGrid(current.Position))
+    {
+        Print(PRINT, "  Out of grid");
+        return long.MaxValue;
+    }
 
     if (grid.IsWall(current.Position))
     {
@@ -98,7 +103,7 @@ static long exploreRecursive(LongBasedGrid grid, PositionState current, Position
 
         Print(PRINT, "  Trying to move to " + candidate);
 
-        if (!grid.IsWall(candidate))
+        if (!grid.IsWall(candidate) && grid.IsInGrid(candidate))
         {
             long candidateScore = exploreRecursive(grid, 
                 new PositionState(candidate, current.Direction), 
