@@ -48,76 +48,78 @@ static void part1(LongBasedGrid grid, Position start, Position end)
 {
     bool PRINT = false;
 
-    long score = exploreRecursive(grid, new PositionState(start, Direction.Right), end, 0, PRINT);
+    long score = exploreIterative(grid, new PositionState(start, Direction.Right), end, PRINT);
 
     Console.WriteLine($"Score: {score}");
 }
 
-static long exploreRecursive(LongBasedGrid grid, PositionState current, Position end, long score, bool PRINT)
+static long exploreIterative(LongBasedGrid grid, PositionState start, Position end, bool PRINT)
 {
-    Print(PRINT, "Exploring: " + current);
-
-    if(!grid.IsInGrid(current.Position))
-    {
-        Print(PRINT, "  Out of grid");
-        return long.MaxValue;
-    }
-
-    if (grid.IsWall(current.Position))
-    {
-        Print(PRINT, "  Wall");
-        return long.MaxValue;
-    }
-
-    long score2 = grid.GetAt(current.Position);
-
-    //The current path is a worse path
-    if (score2 <= score)
-    {
-        Print(PRINT, "  Worse path");
-        return long.MaxValue;  
-    }
-
-    // the current path is a better path
-    grid.SetAt(current.Position, score);
-
-
-    if (current.Position == end)
-    {
-        Print(PRINT, "  End at position " + current + " with score " + score);
-        return score;
-    }
-
+    Stack<(PositionState current, long score)> stack = new();
+    stack.Push((start, 0));
     long betterScore = long.MaxValue;
-    for (int i = 0; i < 4; i++)
+
+    while (stack.Count > 0)
     {
-        int turnCost = i switch
-        {
-            0 => 0,
-            1 => 1000,
-            2 => 2000,
-            3 => 1000,
-            _ => throw new Exception("Invalid turn cost")
-        };
-        Position candidate = current.InFront();
+        var (current, score) = stack.Pop();
+        Print(PRINT, "Exploring: " + current);
 
-        Print(PRINT, "  Trying to move to " + candidate);
-
-        if (!grid.IsWall(candidate) && grid.IsInGrid(candidate))
+        if (!grid.IsInGrid(current.Position))
         {
-            long candidateScore = exploreRecursive(grid, 
-                new PositionState(candidate, current.Direction), 
-                end, 
-                score + 1 + turnCost,
-                PRINT
-            );
-            betterScore = Math.Min(betterScore, candidateScore);
+            Print(PRINT, "  Out of grid");
+            continue;
         }
-        current = current.turnRight();
+
+        if (grid.IsWall(current.Position))
+        {
+            Print(PRINT, "  Wall");
+            continue;
+        }
+
+        long score2 = grid.GetAt(current.Position);
+
+        // The current path is a worse path
+        if (score2 <= score)
+        {
+            Print(PRINT, "  Worse path");
+            continue;
+        }
+
+        // The current path is a better path
+        grid.SetAt(current.Position, score);
+
+        if (current.Position == end)
+        {
+            Print(PRINT, "  End at position " + current + " with score " + score);
+            betterScore = Math.Min(betterScore, score);
+            continue;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            int turnCost = i switch
+            {
+                0 => 0,
+                1 => 1000,
+                2 => 2000,
+                3 => 1000,
+                _ => throw new Exception("Invalid turn cost")
+            };
+            Position candidate = current.InFront();
+
+            Print(PRINT, "  Trying to move to " + candidate);
+
+            if (!grid.IsWall(candidate) && grid.IsInGrid(candidate))
+            {
+                stack.Push((new PositionState(candidate, current.Direction), score + 1 + turnCost));
+            }
+            current = current.turnRight();
+        }
     }
 
     return betterScore;
 }
+
 static void Print(bool print, string s)
 {
     if (print)
