@@ -183,9 +183,10 @@ static long exploreIterativePart2(RecordBasedGrid grid, PositionState start, Pos
 
             if (betterScore == knownBestScore)
             {
-                Print(PRINT, "Will backtrack on grid:");
-                //grid.Print(6);
-                //Console.WriteLine();
+                Console.WriteLine("Will backtrack on grid:");
+                grid.Print(6);
+                Console.WriteLine();
+
                 var pathsForThisSolution = computeBacktrackPath(grid, start, current, score);
 
                 foreach (var p in pathsForThisSolution)
