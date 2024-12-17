@@ -2,7 +2,7 @@
 using ConsoleApp;
 
 
-var filePath = "./input_data/test_input2.txt";
+var filePath = "./input_data/input.txt";
 string[] lines;
 if (System.IO.File.Exists(filePath))
 {
@@ -55,25 +55,22 @@ static long part1(TextBasedGrid grid, Position start, Position end)
     return score;
 }
 
-static void part2(TextBasedGrid grid, Position start, Position end, long knownBestScore)
+static void part2(TextBasedGrid textGrid, Position start, Position end, long knownBestScore)
 {
     bool PRINT = false;
 
-    var grid2 = new RecordBasedGrid(grid);
-    grid2.ReplaceAll('#', LongBasedGrid.WALL);
-    grid2.ReplaceAll('.', long.MaxValue);
+    var grid = new RecordBasedGrid(textGrid, '#', long.MaxValue);
 
-    HashSet<Position> paths = new();
 
-    long score = exploreIterativePart2(grid2, new PositionState(start, Direction.Right), end, PRINT, paths, knownBestScore);
+    var paths = exploreIterativePart2(grid, new PositionState(start, Direction.Right), end, PRINT, knownBestScore);
 
-    grid2.Print(6);
+    grid.Print(17);
 
     foreach (var p in paths)
     {
-        grid.SetAt(p, '0');
+        textGrid.SetAt(p, '0');
     }
-    grid.Print();
+    textGrid.Print();
 
     Console.WriteLine($"total unique positions on best paths: {paths.Count}");
 }
@@ -146,52 +143,44 @@ static long exploreIterativePart1(LongBasedGrid grid, PositionState start, Posit
 }
 
 
-static long exploreIterativePart2(RecordBasedGrid grid, PositionState start, Position end, bool PRINT, HashSet<Position> paths, long knownBestScore)
+static HashSet<Position> exploreIterativePart2(RecordBasedGrid grid, PositionState start, Position end, bool PRINT,  long knownBestScore)
 {
+    HashSet<Position> paths = new();
+
     Stack<(PositionState current, long score)> stack = new();
     stack.Push((start, 0));
-    long betterScore = long.MaxValue;
 
     while (stack.Count > 0)
     {
         var (current, score) = stack.Pop();
-        var orientedScore = new OrientedScore(score, current.Direction);
-        Print(PRINT, "Exploring: " + current);
 
-        OrientedScore? score2 = grid.GetAt(current.Position);
+        long score2 = grid.GetAt(current.Position, current.Direction);
 
-        if (score2 == null) throw new Exception("Just for safety");
-
-        long score2oriented = score2!.ScoreWhenReoriented(current.Direction);
         // The current path is a worse path
-        if (score2oriented < score)
+        if (score2 < score)
         {
             Print(PRINT, "  Worse path");
             continue;
         }
 
         // The current path is a better or equal path
-        grid.SetAt(current.Position, new OrientedScore(score, current.Direction));
+        grid.SetAt(current.Position, current.Direction, score);
 
         if (current.Position == end)
         {
             Print(PRINT, "  End at position " + current + " with score " + score);
-            if(score <= betterScore)
-            {
-                betterScore = score;
-            }
 
-            if (betterScore == knownBestScore)
+            if (score == knownBestScore)
             {
-                Console.WriteLine("Will backtrack on grid:");
-                grid.Print(6);
+                //Console.WriteLine("Will backtrack on grid:");
+                //grid.Print(17);
                 Console.WriteLine();
 
                 var pathsForThisSolution = computeBacktrackPath(grid, start, current, score);
 
                 foreach (var p in pathsForThisSolution)
                 {
-                    paths.Add(p.Position);
+                    paths.Add(p);
                 }
             }
 
@@ -212,15 +201,16 @@ static long exploreIterativePart2(RecordBasedGrid grid, PositionState start, Pos
 
             Print(PRINT, "  Trying to move to " + candidate);
 
-            if (!grid.IsWall(candidate) && grid.IsInGrid(candidate))
+            if (grid.Exists(candidate))
             {
-                stack.Push((new PositionState(candidate, current.Direction), score + 1 + turnCost));
+                long orientedScore = score + turnCost;
+                stack.Push((new PositionState(candidate, current.Direction), orientedScore + 1));
             }
             current = current.turnRight();
         }
     }
 
-    return betterScore;
+    return paths;
 }
 
 
@@ -233,12 +223,12 @@ static void Print(bool print, string s)
     }
 }
 
-static HashSet<PositionState> computeBacktrackPath(RecordBasedGrid grid, PositionState start, PositionState end, long endScore)
+static HashSet<Position> computeBacktrackPath(RecordBasedGrid grid, PositionState start, PositionState end, long endScore)
 {
     Stack<(PositionState current, long score)> stack = new();
     stack.Push((end, endScore));
 
-    HashSet<PositionState> positions = new();
+    HashSet<Position> positions = new();
 
 
     //trace back path
@@ -246,20 +236,20 @@ static HashSet<PositionState> computeBacktrackPath(RecordBasedGrid grid, Positio
     {
         var (current, score) = stack.Pop();
 
-        positions.Add(current);
+        positions.Add(current.Position);
 
         if (current == start)
         {
             continue;
         }
 
-        var candidates = new List<Position>();
+        var candidates = new List<PositionState>();
         for (int origin = 0; origin <4; origin++)
         {
-            Position candidate = current.Behind();
+            PositionState candidate = current.Behind();
             current = current.turnLeft();
 
-            if (!grid.IsWall(candidate) && grid.IsInGrid(candidate))
+            if (grid.Exists(candidate.Position))
             {
                 candidates.Add(candidate);
             }
@@ -267,20 +257,28 @@ static HashSet<PositionState> computeBacktrackPath(RecordBasedGrid grid, Positio
 
         foreach (var candidate in candidates)
         {
-            //long expectedPreviousScore = score - 1 - rotateCost;
-            var candidateOientedScore = grid.GetAt(candidate);
-
-            if (candidateOientedScore == null)
+            for (int candidateEdge = 0; candidateEdge < 4; candidateEdge++)
             {
-                throw new Exception("Nah.");
+                int rotationsNeeded = (candidateEdge - (int)candidate.Direction + 4) % 4;
+                int turnCost = rotationsNeeded switch
+                {
+                    0 => 0,
+                    1 => 1000,
+                    2 => 2000,
+                    3 => 1000,
+                    _ => throw new Exception("Invalid turn cost")
+                };
+
+                long edgeScore = grid.GetAt(candidate.Position, (Direction)candidateEdge);
+
+                if (edgeScore + turnCost + 1 == score)
+                {
+                    stack.Push((candidate, edgeScore));
+                }
+
             }
 
-            var orientedValue = candidateOientedScore!.ScoreWhenReoriented(current.Direction);
-            if (orientedValue+1 == score)
-            {
-                stack.Push((new PositionState(candidate, candidateOientedScore.Direction), candidateOientedScore.Score));
-                break;
-            }
+
         }
 
     }
