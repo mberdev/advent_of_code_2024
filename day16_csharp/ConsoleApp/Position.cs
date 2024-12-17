@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
-    public enum Direction { 
+    public enum Direction
+    {
         Up = 0,
         Right = 1,
         Down = 2,
@@ -92,7 +93,45 @@ namespace ConsoleApp
 
         public PositionState turnLeft()
         {
-            return new PositionState(Position, (Direction)(((int)Direction+4 - 1) % 4));
+            return new PositionState(Position, (Direction)(((int)Direction + 4 - 1) % 4));
         }
+    }
+
+    public record OrientedScore
+    {
+        public long Score { get; init; }
+        public Direction Direction { get; init; }
+
+        public OrientedScore(long score, Direction direction)
+        {
+            Score = score;
+            Direction = direction;
+        }
+
+        public long ScoreWhenReoriented(Direction d)
+        {
+            if(Score == long.MaxValue)
+            {
+                return long.MaxValue;
+            }
+
+            if(Score < 0)
+            {
+                throw new Exception("Should not be a wall");
+            }
+
+            int rotationsRequired = Math.Abs((int)d - (int)Direction);
+            long rotateCost = rotationsRequired switch
+            {
+                0 => 0,
+                1 => 1000,
+                2 => 2000,
+                3 => 1000,
+                _ => throw new Exception("Invalid turn cost")
+            };
+
+            return Score + rotateCost;
+        }
+
     }
 }
