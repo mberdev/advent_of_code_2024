@@ -61,6 +61,8 @@ static void part2(TextBasedGrid grid, Position start, Position end)
 
     long score = exploreIterativePart2(grid2, new PositionState(start, Direction.Right), end, PRINT, paths);
 
+    grid2.Print(6);
+
     foreach(var p in paths)
     {
         grid.SetAt(p, '0');

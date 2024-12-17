@@ -22,7 +22,8 @@ namespace ConsoleApp
                     if (!char.IsDigit(lines[y][x]))
                     {
                         this.Grid[x, y] = -1L;
-                    } else
+                    }
+                    else
                     {
                         this.Grid[x, y] = long.Parse(lines[y][x].ToString()); this.Grid[x, y] = long.Parse(lines[y][x].ToString());
                     }
@@ -69,7 +70,7 @@ namespace ConsoleApp
 
         public void SetAt(int x, int y, long value)
         {
-            if(!IsInGrid(x, y))
+            if (!IsInGrid(x, y))
             {
                 return;
             }
@@ -93,6 +94,31 @@ namespace ConsoleApp
                         SetAt(x, y, newValue);
                     }
                 }
+            }
+        }
+
+        public void Print(int padding)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    long value = GetAt(x, y);
+                    if (value == WALL)
+                    {
+                        Console.Write("#".PadLeft(padding));
+                    }
+                    else if (value == long.MaxValue)
+                    {
+                        Console.Write(new string( ' ', padding));
+                    }
+                    else
+                    {
+                        Console.Write(GetAt(x, y).ToString().PadLeft(padding));
+                    }
+                }
+
+                Console.WriteLine();
             }
         }
     }
