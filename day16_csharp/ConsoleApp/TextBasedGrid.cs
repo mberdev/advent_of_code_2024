@@ -74,6 +74,18 @@ namespace ConsoleApp
                 }
             }
         }
+
+        public void Print()
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    Console.Write(GetAt(x, y));
+                }
+                Console.WriteLine("");
+            }
+        }
     }
 }
 

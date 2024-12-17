@@ -73,10 +73,26 @@ namespace ConsoleApp
             };
         }
 
+        public Position Behind()
+        {
+            return Direction switch
+            {
+                Direction.Up => new Position(Position.X, Position.Y + 1),
+                Direction.Down => new Position(Position.X, Position.Y - 1),
+                Direction.Left => new Position(Position.X + 1, Position.Y),
+                Direction.Right => new Position(Position.X - 1, Position.Y),
+                _ => throw new Exception("Invalid direction")
+            };
+        }
+
         public PositionState turnRight()
         {
             return new PositionState(Position, (Direction)(((int)Direction + 1) % 4));
         }
 
+        public PositionState turnLeft()
+        {
+            return new PositionState(Position, (Direction)(((int)Direction+4 - 1) % 4));
+        }
     }
 }

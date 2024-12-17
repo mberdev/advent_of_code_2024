@@ -5,6 +5,7 @@ namespace ConsoleApp
     public class LongBasedGrid
     {
         public const int WALL = -2;
+        public const int DEADEND = -3;
 
 
         public long[,] Grid { get; private set; }
