@@ -1,6 +1,6 @@
 ﻿namespace ConsoleApp
 {
-    public class OneStep : Dictionary<long, List<long>>
+    public class OneStepMap : Dictionary<long, List<long>>
     {
         public List<long> GetStone(long stone)
         {

@@ -4,12 +4,12 @@ namespace ConsoleApp
 {
     public class Counter
     {
-        private OneStep d1;
+        private OneStepMap d1;
         private int blinksTarget;
 
         private Dictionary<long, long>[] countPerDepth;
 
-        public Counter(OneStep d1, int blinksTarget)
+        public Counter(OneStepMap d1, int blinksTarget)
         {
             this.d1 = d1;
             this.blinksTarget = blinksTarget;
