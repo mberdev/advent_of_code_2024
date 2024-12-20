@@ -23,15 +23,15 @@ Console.WriteLine("Done.");
 
 static void part2(long[] stones)
 {
-    var d = new OneStepMap();
     int BLINKS = 75;
 
-    InitOneStep(stones, d, BLINKS);
+    var d = new OneStepMap();
+    d.Build(stones, BLINKS);
 
     Console.WriteLine("Map built");
     //printMap(d);
 
-    var counter = new Counter(d, 75);
+    var counter = new Counter(d, BLINKS);
 
     long total = 0;
     foreach (var s in stones)
@@ -51,25 +51,3 @@ static void Print(bool print, string s)
     }
 }
 
-static void InitOneStep(long[] stones, OneStepMap d, int BLINKS)
-{
-    //1st pass : stones from input
-    foreach (long stone in stones)
-    {
-        d.GetStone(stone);
-    }
-
-    //BLINKS extra passes (each pass gets fed the previous pass result)
-    for (int i = 0; i < BLINKS; i++)
-    {
-        var originalStones = d.Keys.ToList();
-        foreach (var stone in originalStones)
-        {
-            var newStones = d.GetStone(stone);
-            foreach (var newStone in newStones)
-            {
-                d.GetStone(newStone);
-            }
-        }
-    }
-}

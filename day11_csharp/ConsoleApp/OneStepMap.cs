@@ -2,7 +2,30 @@
 {
     public class OneStepMap : Dictionary<long, List<long>>
     {
-        public List<long> GetStone(long stone)
+        public void Build(long[] stones, int passes)
+        {
+            //1st pass : stones from input
+            foreach (long stone in stones)
+            {
+                GetOrCreateStone(stone);
+            }
+
+            //BLINKS extra passes (each pass gets fed the previous pass result)
+            for (int i = 0; i < passes; i++)
+            {
+                var originalStones = Keys.ToList();
+                foreach (var stone in originalStones)
+                {
+                    var newStones = GetOrCreateStone(stone);
+                    foreach (var newStone in newStones)
+                    {
+                        GetOrCreateStone(newStone);
+                    }
+                }
+            }
+        }
+
+        public List<long> GetOrCreateStone(long stone)
         {
             if (!this.ContainsKey(stone))
             {
