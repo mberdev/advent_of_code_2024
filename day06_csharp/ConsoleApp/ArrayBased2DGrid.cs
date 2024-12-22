@@ -6,57 +6,60 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
-    public class TextBasedGrid
+    public class ArrayBased2DGrid<V> where V:IEquatable<V>
     {
-        public TextBasedGrid(string[] lines)
+        public ArrayBased2DGrid(V[][] lines)
         {
             this.Lines = lines;
+            this.Width = Lines[0].Length;
+            this.Height = Lines.Length;    
         }
-        public string[] Lines { get; private set; }
-        public int Width => Lines[0].Length;
-        public int Height => Lines.Length;
 
-        public bool IsObstacle(Position pos) => GetAt(pos) != '.';
-        public bool IsInGrid(Position pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
+        public V[][] Lines { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
-        public bool IsValid(Position pos) => IsInGrid(pos) && !IsObstacle(pos);
-        public char GetAt(int x, int y)
+        public bool Is(Position pos, V value) => value.Equals(GetAt(pos));
+        public bool IsNot(Position pos, V value) => !value.Equals(pos);
+        public bool IsInGrid(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
+        public bool IsInGrid(Position pos) => IsInGrid(pos.X, pos.Y);
+
+        public V? GetAt(int x, int y)
         {
-            if (x < 0 || x >= Width || y < 0 || y >= Height)
+            if (!IsInGrid(x, y))
             {
-                return '\0';
+                return default(V);
             }
             return Lines[y][x];
         }
 
-        public char GetAt(Position position)
+        public V? GetAt(Position position)
         {
             return GetAt(position.X, position.Y);
         }
 
-        public void SetAt(int x, int y, char value)
+        public void SetAt(int x, int y, V value)
         {
-            if (x < 0 || x >= Width || y < 0 || y >= Height)
+            if (!IsInGrid(x, y))
             {
                 return;
             }
-            var line = Lines[y].ToCharArray();
-            line[x] = value;
-            Lines[y] = new string(line);
+
+            Lines[y][x] = value;
         }
 
-        public void SetAt(Position position, char value)
+        public void SetAt(Position position, V value)
         {
             SetAt(position.X, position.Y, value);
         }
 
-        public Position? Find(char c)
+        public Position? Find(V c)
         {
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    if (GetAt(x, y) == c)
+                    if (c.Equals(GetAt(x, y)))
                     {
                         return new Position(x, y);
                     }
@@ -65,13 +68,13 @@ namespace ConsoleApp
             return null;
         }
 
-        public void ReplaceAll(char c, char newValue)
+        public void ReplaceAll(V c, V newValue)
         {
             for (int y = 0; y < Height; y++)
             {
                 for (int x = 0; x < Width; x++)
                 {
-                    if (GetAt(x, y) == c)
+                    if (c.Equals(GetAt(x, y)))
                     {
                         SetAt(x, y, newValue);
                     }
@@ -89,12 +92,6 @@ namespace ConsoleApp
                 }
                 Console.WriteLine("");
             }
-        }
-
-        public TextBasedGrid Copy()
-        {
-            var linesClone = Lines.Select(l => new string(l)).ToArray();
-            return new TextBasedGrid(linesClone);
         }
     }
 }
