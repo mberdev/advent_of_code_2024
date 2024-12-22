@@ -16,6 +16,10 @@ namespace ConsoleApp
         public int Width => Lines[0].Length;
         public int Height => Lines.Length;
 
+        public bool IsObstacle(Position pos) => GetAt(pos) != '.';
+        public bool IsInGrid(Position pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
+
+        public bool IsValid(Position pos) => IsInGrid(pos) && !IsObstacle(pos);
         public char GetAt(int x, int y)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height)

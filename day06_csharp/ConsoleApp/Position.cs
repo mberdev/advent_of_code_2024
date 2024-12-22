@@ -69,14 +69,14 @@ namespace ConsoleApp
         }
 
 
-        public Position InFront()
+        public PositionState InFront()
         {
             return Direction switch
             {
-                Direction.Up => new Position(Position.X, Position.Y - 1),
-                Direction.Down => new Position(Position.X, Position.Y + 1),
-                Direction.Left => new Position(Position.X - 1, Position.Y),
-                Direction.Right => new Position(Position.X + 1, Position.Y),
+                Direction.Up => new PositionState(Position.X, Position.Y - 1, Direction),
+                Direction.Down => new PositionState(Position.X, Position.Y + 1, Direction),
+                Direction.Left => new PositionState(Position.X - 1, Position.Y, Direction),
+                Direction.Right => new PositionState(Position.X + 1, Position.Y, Direction),
                 _ => throw new Exception("Invalid direction")
             };
         }
