@@ -8,52 +8,43 @@ namespace ConsoleApp
 {
     public class OptimizedPath
     {
+        private static int GetHash(int x, int y)
+        {
+            return x * 10000 + y;
+        }
 
-        public Dictionary<int, Dictionary<int, HashSet<Direction>>> d { get; init; } = new();
+        public Dictionary<int, bool[]> d { get; init; } = new();
 
         public void Push(PositionState pos)
         {
+            int hash = GetHash(pos.Position.X, pos.Position.Y);
 
-            if (!d.TryGetValue(pos.Position.X, out var d2))
+            if (!d.TryGetValue(hash, out var h))
             {
-                d.Add(pos.Position.X, new Dictionary<int, HashSet<Direction>>());
-                d2 = d[pos.Position.X];
+                h = new bool[4];
+                d[hash] = h;
             }
 
-            if (!d2.TryGetValue(pos.Position.Y, out var h))
-            {
-                d2.Add(pos.Position.Y, new HashSet<Direction>());
-                h = d2[pos.Position.Y];
-            }
-
-            h.Add(pos.Direction);
+            h[(int)pos.Direction] = true;
         }
 
         public bool Contains(PositionState pos)
         {
+            int hash = GetHash(pos.Position.X, pos.Position.Y);
 
-            if (!d.TryGetValue(pos.Position.X, out var d2))
+            if (!d.TryGetValue(hash, out var h))
             {
                 return false;
             }
 
-            if (!d2.TryGetValue(pos.Position.Y, out var h))
-            {
-                return false;
-            }
-
-            return h.Contains(pos.Direction);
+            return h[(int)pos.Direction];
         }
 
         public bool ContainsPosition(Position pos)
         {
 
-            if (!d.TryGetValue(pos.X, out var d2))
-            {
-                return false;
-            }
-
-            return d2.ContainsKey(pos.Y);
+            int hash = GetHash(pos.X, pos.Y);
+            return d.ContainsKey(hash);
         }
 
         //public OptimizedPath Copy()
@@ -68,18 +59,22 @@ namespace ConsoleApp
 
         public List<PositionState> Get()
         {
-            var result = new List<PositionState>();
-            foreach (var i in d)
+            var positions = new List<PositionState>();
+            foreach (var entry in d)
             {
-                foreach (var j in i.Value)
+                int h = entry.Key;
+                int x = h / 10000;
+                int y = h % 10000;
+
+                for (int i = 0; i < 4; i++)
                 {
-                    foreach (var k in j.Value)
+                    if (entry.Value[i])
                     {
-                        result.Add(new PositionState(i.Key, j.Key, k));
+                        positions.Add(new PositionState(x, y, (Direction)i));
                     }
                 }
             }
-            return result;
+            return positions;
 
         }
     }
