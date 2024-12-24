@@ -112,11 +112,11 @@ static List<PositionState> explore2(TextBasedGrid grid, PositionState start)
 
     while (true)
     {
-        // For control
-        if(progress%500 == 499)
-        {
-            Console.WriteLine("Progress: " + progress + "...");
-        }
+        //// For control
+        //if(progress%500 == 499)
+        //{
+        //    Console.WriteLine("Progress: " + progress + "...");
+        //}
 
         path.Push(current);
 
@@ -133,12 +133,6 @@ static List<PositionState> explore2(TextBasedGrid grid, PositionState start)
         int attempt = 0;
         while(grid.IsObstacle(nextMoveCandidate.Position))
         {
-            if(!grid.IsObstacle(nextMoveCandidate.Position))
-            {
-                break;
-            }
-
-            // Obstacle
             current = current.turnRight();
             path.Push(current);
 
@@ -213,12 +207,6 @@ static OptimizedPath? findLoop(TextBasedGrid grid, PositionState start, Optimize
         int attempt = 0;
         while(grid.IsObstacle(nextMoveCandidate.Position))
         {
-            if (!grid.IsObstacle(nextMoveCandidate.Position))
-            {
-                break;
-            }
-
-            // Obstacle
             current = current.turnRight();
 
             if (path.Contains(current) || loopPath.Contains(current))
