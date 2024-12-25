@@ -65,40 +65,45 @@ static (int a, int b, int c, int d) CountQuadrants(PacmanGrid grid, List<Positio
 
     Console.WriteLine($"D: {bottomRightMinX} {bottomRightMaxX} {bottomRightMinY} {bottomRightMaxY}");
 
-    var aItems = updated.Where(p => p.X >= topLeftMinX && p.X <= topLeftMaxX && p.Y >= topLeftMinY && p.Y <= topLeftMaxY);
-    var bItems = updated.Where(p => p.X >= topRightMinX && p.X <= topRightMaxX && p.Y >= topRightMinY && p.Y <= topRightMaxY);
-    var cItems = updated.Where(p => p.X >= bottomLeftMinX && p.X <= bottomLeftMaxX && p.Y >= bottomLeftMinY && p.Y <= bottomLeftMaxY);
-    var dItems = updated.Where(p => p.X >= bottomRightMinX && p.X <= bottomRightMaxX && p.Y >= bottomRightMinY && p.Y <= bottomRightMaxY);
+    //var aItems = updated.Where(p => p.X >= topLeftMinX && p.X <= topLeftMaxX && p.Y >= topLeftMinY && p.Y <= topLeftMaxY);
+    //var bItems = updated.Where(p => p.X >= topRightMinX && p.X <= topRightMaxX && p.Y >= topRightMinY && p.Y <= topRightMaxY);
+    //var cItems = updated.Where(p => p.X >= bottomLeftMinX && p.X <= bottomLeftMaxX && p.Y >= bottomLeftMinY && p.Y <= bottomLeftMaxY);
+    //var dItems = updated.Where(p => p.X >= bottomRightMinX && p.X <= bottomRightMaxX && p.Y >= bottomRightMinY && p.Y <= bottomRightMaxY);
 
-    Console.Write("A:");
-    foreach (var item in aItems)
-    {
-        Console.Write(item);
-    }
-    Console.WriteLine();
-    Console.Write("B:");
-    foreach (var item in bItems)
-    {
-        Console.Write(item);
-    }
-    Console.WriteLine();
-    Console.Write("C:");
-    foreach (var item in cItems)
-    {
-        Console.Write(item);
-    }
-    Console.WriteLine();
-    Console.Write("D:");
-    foreach (var item in dItems)
-    {
-        Console.Write(item);
-    }
-    Console.WriteLine();
+    //Console.Write("A:");
+    //foreach (var item in aItems)
+    //{
+    //    Console.Write(item);
+    //}
+    //Console.WriteLine();
+    //Console.Write("B:");
+    //foreach (var item in bItems)
+    //{
+    //    Console.Write(item);
+    //}
+    //Console.WriteLine();
+    //Console.Write("C:");
+    //foreach (var item in cItems)
+    //{
+    //    Console.Write(item);
+    //}
+    //Console.WriteLine();
+    //Console.Write("D:");
+    //foreach (var item in dItems)
+    //{
+    //    Console.Write(item);
+    //}
+    //Console.WriteLine();
 
-    var a = aItems.Count();
-    var b = bItems.Count();
-    var c = cItems.Count();
-    var d = dItems.Count();
+    //var a = aItems.Count();
+    //var b = bItems.Count();
+    //var c = cItems.Count();
+    //var d = dItems.Count();
+
+    var a = updated.Count(p => p.X >= topLeftMinX && p.X <= topLeftMaxX && p.Y >= topLeftMinY && p.Y <= topLeftMaxY);
+    var b = updated.Count(p => p.X >= topRightMinX && p.X <= topRightMaxX && p.Y >= topRightMinY && p.Y <= topRightMaxY);
+    var c = updated.Count(p => p.X >= bottomLeftMinX && p.X <= bottomLeftMaxX && p.Y >= bottomLeftMinY && p.Y <= bottomLeftMaxY);
+    var d = updated.Count(p => p.X >= bottomRightMinX && p.X <= bottomRightMaxX && p.Y >= bottomRightMinY && p.Y <= bottomRightMaxY);
 
     return (a, b, c, d);
 }
@@ -117,10 +122,10 @@ static List<Position> Simulate(List<(Position, Vector)> robots, PacmanGrid grid,
         positions.Add(new Position(x, y));
     }
 
-    foreach (var position in positions)
-    {
-        Console.WriteLine(position);
-    }
+    //foreach (var position in positions)
+    //{
+    //    Console.WriteLine(position);
+    //}
 
     return positions;
 }

@@ -34,10 +34,10 @@ namespace ConsoleApp
 
 
             // Control
-            foreach (var item in data)
-            {
-                Console.WriteLine($"{item.Item1} {item.Item2}");
-            }
+            //foreach (var item in data)
+            //{
+            //    Console.WriteLine($"{item.Item1} {item.Item2}");
+            //}
             return data;
         }
     }
