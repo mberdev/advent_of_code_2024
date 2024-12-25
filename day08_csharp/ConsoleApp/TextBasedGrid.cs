@@ -30,6 +30,11 @@ namespace ConsoleApp
             return GetAt(position.X, position.Y);
         }
 
+        public bool IsInGrid(Position position)
+        {
+            return position.X >= 0 && position.X < Width && position.Y >= 0 && position.Y < Height;
+        }
+
         public void SetAt(int x, int y, char value)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height)

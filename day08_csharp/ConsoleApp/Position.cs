@@ -29,22 +29,19 @@ namespace ConsoleApp
         {
             return $"({X}, {Y})";
         }
+
+        public Position Add(Vector v)
+        {
+            return new Position(X + v.X, Y + v.Y);
+        }
+
+        public Position Subtract(Vector v)
+        {
+            return new Position(X - v.X, Y - v.Y);
+        }
     }
 
-    public record LongPosition
-    {
-        public LongPosition(long x, long y)
-        {
-            X = x;
-            Y = y;
-        }
-        public long X { get; }
-        public long Y { get; }
-        public override string ToString()
-        {
-            return $"({X}, {Y})";
-        }
-    }
+
 
     public record PositionState
     {
@@ -104,84 +101,4 @@ namespace ConsoleApp
         }
     }
 
-    public record FourScores
-    {
-        public long[] Scores = new long[4];
-
-
-        public FourScores(long defaultValue)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                Scores[i] = defaultValue;
-            }
-        }
-
-        public void SetScore(Direction direction, long score)
-        {
-            Scores[(int)direction] = score;
-        }
-
-        public long GetScore(Direction direction)
-        {
-            return Scores[(int)direction];
-        }
-
-
-        public Direction oppositeDirection(Direction direction)
-        {
-            switch (direction)
-            {
-                case Direction.Left:
-                    return Direction.Right;
-                case Direction.Right:
-                    return Direction.Left;
-                case Direction.Up:
-                    return Direction.Down;
-                case Direction.Down:
-                    return Direction.Up;
-                default:
-                    throw new Exception("");
-            };
-        }
-
-
-        //public long ScoreWhenReoriented(Direction d)
-        //{
-        //    if(Score == long.MaxValue)
-        //    {
-        //        return long.MaxValue;
-        //    }
-
-        //    if(Score < 0)
-        //    {
-        //        throw new Exception("Should not be a wall");
-        //    }
-
-        //    int rotationsRequired = Math.Abs((int)d - (int)Direction);
-        //    long rotateCost = rotationsRequired switch
-        //    {
-        //        0 => 0,
-        //        1 => 1000,
-        //        2 => 2000,
-        //        3 => 1000,
-        //        _ => throw new Exception("Invalid turn cost")
-        //    };
-
-        //    return Score + rotateCost;
-        //}
-
-        private string scoreToString(long score)
-        {
-            if (score == long.MaxValue)
-                return "MAX";
-            
-            return score.ToString();
-        }
-        public override string ToString()
-        {
-            return $"{scoreToString(Scores[0])}/{scoreToString(Scores[1])}/{scoreToString(Scores[2])}/{scoreToString(Scores[3])}";
-        }
-
-    }
 }
