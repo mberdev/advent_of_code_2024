@@ -89,13 +89,7 @@ Stack<char>? TryStep(long value, List<long> operands, char? oprator)
 
     if (operands.Count == 1)
     {
-        if (oprator == '*' && operand == value)
-        {
-            operators = new Stack<char>();
-            operators.Push((char)oprator!);
-            return operators;
-        }
-        else if (oprator == '+' && operand == value)
+        if (operand == value)
         {
             operators = new Stack<char>();
             operators.Push((char)oprator!);
@@ -130,6 +124,23 @@ Stack<char>? TryStep(long value, List<long> operands, char? oprator)
         }
         return operators;
     }
+
+    // Operator ||
+    if (value>operand && value.ToString().EndsWith(operand.ToString()))
+    {
+        var separatedValue = long.Parse(value.ToString().Substring(0, value.ToString().Length - operand.ToString().Length));
+
+        operators = TryStep(separatedValue, operandsClone, '|');
+        if (operators != null)
+        {
+            if (oprator != null)
+            {
+                operators.Push((char)oprator!);
+            }
+            return operators;
+        }
+    }
+
 
     return null;
 }
