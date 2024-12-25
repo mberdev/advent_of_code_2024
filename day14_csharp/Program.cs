@@ -13,7 +13,7 @@ else
     throw new FileNotFoundException("The specified file was not found.", filePath);
 }
 
-var grid = new TextBasedGrid(lines);
+var data = InputParser.ParseInput(lines);
 
 // Control
 //Console.WriteLine(data);
