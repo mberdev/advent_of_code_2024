@@ -22,9 +22,14 @@ namespace ConsoleApp
             X = x;
             Y = y;
         }
-        public int X { get; }
-        public int Y { get; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
 
+        public void Modulo(int modX, int modY)
+        {
+            X = X % modX;
+            Y = Y % modY;
+        }
         public override string ToString()
         {
             return $"({X}, {Y})";
