@@ -19,8 +19,8 @@ var grid = new TextBasedGrid(lines);
 //Console.WriteLine(data);
 
 
-part1(grid);
-//part2(grid, start, end, knownBestScore);
+//part1(grid);
+part2(grid);
 
 Console.WriteLine("Done.");
 
@@ -66,6 +66,52 @@ static void part1(TextBasedGrid grid)
     }
 
     Console.WriteLine($"Antinodes count: {allAntinodes.Count}");
+
+}
+
+static void part2(TextBasedGrid grid)
+{
+    var antennas = InputParser.ParseInput(grid);
+
+    HashSet<Position> antinodes = new();
+
+    foreach (var (key, positions) in antennas)
+    {
+
+        //Console.WriteLine($"Antenna {key}: {string.Join(", ", value)}");
+        var allPairs = FindAllPairs(positions);
+
+        foreach (var (start, end) in allPairs)
+        {
+            //Console.WriteLine($"   Antenna {key}: {start} -> {end}");
+            Vector vector = new Vector(start, end);
+
+            Position p = start;
+            while(grid.IsInGrid(p))
+            {
+                antinodes.Add(p);
+                p = p.Subtract(vector);
+            }
+
+            p = end;
+            while (grid.IsInGrid(p))
+            {
+                antinodes.Add(p);
+                p = p.Add(vector);
+            }
+        }
+
+
+        //Console.WriteLine($"Antenna {key} antinodes: {string.Join(", ", validAntinodes)}");
+        //foreach (var antinode in validAntinodes)
+        //{
+        //    grid.SetAt(antinode, '#');
+        //}
+        //grid.Print();
+        //Console.WriteLine();
+    }
+
+    Console.WriteLine($"Antinodes count: {antinodes.Count}");
 
 }
 
