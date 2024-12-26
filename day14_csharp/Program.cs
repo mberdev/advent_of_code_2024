@@ -1,6 +1,19 @@
 ﻿
 using ConsoleApp;
 
+Test();
+
+void Test()
+{
+    var x = new List<int> { 2,3, 10, 20,21,22,29,31};
+    var result = Topology.FindHorizontalContinuousLine(x, 3, 0, 35);
+    int start = result!.Value.Item1;
+    int end = result!.Value.Item2;
+    if (start != 20 || end != 22)
+    {
+        throw new Exception("Test failed");
+    }
+}
 
 var filePath = "./input_data/input.txt";
 string[] lines;
@@ -20,20 +33,75 @@ var height = filePath.Contains("test_input1") ? 7 : 103;
 //Console.WriteLine(data);
 
 
-part1(data, width, height);
-//part2(grid);
+
+//part1(data, width, height);
+part2(data, width, height);
 
 Console.WriteLine("Done.");
 
 
-static void part1(List<(Position, Vector)> robots, int width, int height)
+static void part1(List<(Position, Vector)> data, int width, int height)
 {
     var grid = new PacmanGrid(width, height);
-    var updated = Simulate(robots, grid, 100);
+    var robots = data.Select(d => d.Item1).ToList();
+    var velocities = data.Select(d => d.Item2).ToList();
+    var updated = Simulate(robots, velocities, grid, 100);
     (int a, int b, int c, int d) = CountQuadrants(grid, updated);
     int result = a * b * c * d;
     Console.WriteLine("Part1 : " + result);
 }
+
+static void part2(List<(Position, Vector)> data, int width, int height)
+{
+    var robots = data.Select(d => d.Item1).ToList();
+    var velocities = data.Select(d => d.Item2).ToList();
+
+    var grid = new PacmanGrid(width, height);
+
+    for (int t = 0; t < 1000000; t++)
+    {
+        var horizontalSlices = robots.GroupBy(r => r.Y);
+        (int, int)? horizontalSegment = null;
+        foreach (var slice in horizontalSlices)
+        {
+            var y = slice.Key;
+            var xValues = slice.Select(r => r.X).ToList();
+            int minLineLength = 15;
+            horizontalSegment = Topology.FindHorizontalContinuousLine(xValues, minLineLength, 0, width);
+            if (horizontalSegment!=null)
+            {
+                var start = horizontalSegment!.Value.Item1;
+                var end = horizontalSegment!.Value.Item2;
+
+                //Console.WriteLine($"Found line: ({start}->{end},{y}");
+
+                var robotsToHighlight = Enumerable
+                    .Range(start, end)
+                    .Select(x => new Position(x, y)).ToList();
+
+                grid.Print(robots, robotsToHighlight);
+                Console.WriteLine();
+                Console.WriteLine();
+
+                Console.WriteLine($"Part 2: {t}");
+
+                break;
+            }
+
+        }
+
+
+        robots = Simulate(robots, velocities, grid, 1);
+
+        if(t%1000 == 999)
+        {
+            Console.WriteLine("Time: " + t);
+        }
+    }
+
+}
+
+
 
 static (int a, int b, int c, int d) CountQuadrants(PacmanGrid grid, List<Position> updated)
 {
@@ -108,18 +176,21 @@ static (int a, int b, int c, int d) CountQuadrants(PacmanGrid grid, List<Positio
     return (a, b, c, d);
 }
 
-static List<Position> Simulate(List<(Position, Vector)> robots, PacmanGrid grid, int totalTime)
+static List<Position> Simulate(List<Position> robots, List<Vector> velocities, PacmanGrid grid, int time)
 {
-    var positions = new List<Position>();
-    foreach ((var position, var velocity) in robots)
+    var updated = new List<Position>();
+    for(int r = 0; r < robots.Count; r++)
     {
-        var x = (position.X + totalTime * velocity.X)%grid.Width;
+        var position = robots[r];
+        var velocity = velocities[r];
+
+        var x = (position.X + time * velocity.X)%grid.Width;
         if(x < 0)
             x += grid.Width;
-        var y = (position.Y + totalTime * velocity.Y)%grid.Height;
+        var y = (position.Y + time * velocity.Y)%grid.Height;
         if (y < 0)
             y += grid.Height;
-        positions.Add(new Position(x, y));
+        updated.Add(new Position(x, y));
     }
 
     //foreach (var position in positions)
@@ -127,10 +198,6 @@ static List<Position> Simulate(List<(Position, Vector)> robots, PacmanGrid grid,
     //    Console.WriteLine(position);
     //}
 
-    return positions;
-}
-
-static void part2(TextBasedGrid grid)
-{
+    return updated;
 }
 

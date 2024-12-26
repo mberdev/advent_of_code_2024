@@ -25,16 +25,30 @@ namespace ConsoleApp
 
         }
 
-        //public void Print()
-        //{
-        //    for (int y = 0; y < Height; y++)
-        //    {
-        //        for (int x = 0; x < Width; x++)
-        //        {
-        //            Console.Write(Grid[x, y]);
-        //        }
-        //        Console.WriteLine();
-        //    }
-        //}
+        public void Print(List<Position> allRobots, List<Position> robotsToHighlight)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (allRobots.Any(r => r.X == x && r.Y == y))
+                    {
+                        if (robotsToHighlight.Any(r => r.X == x && r.Y == y))
+                        {
+                            Console.Write("0");
+                        }
+                        else
+                        {
+                            Console.Write("#");
+                        }
+                    }
+                    else
+                    {
+                        Console.Write(" ");
+                    }
+                }
+                Console.WriteLine();
+            }
+        }
     }
 }

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="3.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="input_data\input.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
