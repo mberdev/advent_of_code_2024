@@ -108,6 +108,21 @@ namespace ConsoleApp
                 Console.WriteLine("");
             }
         }
+
+        public void Print(Position specialPosition, char temporaryValue)
+        {
+            char oldValue = GetAt(specialPosition);
+            SetAt(specialPosition, temporaryValue);
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    Console.Write(GetAt(x, y));
+                }
+                Console.WriteLine("");
+            }
+            SetAt(specialPosition, oldValue);
+        }
     }
 }
 
