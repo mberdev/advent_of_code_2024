@@ -66,6 +66,23 @@ namespace ConsoleApp
             return null;
         }
 
+        public List<Position> FindAll(char c)
+        {
+            List<Position> result = new List<Position>();
+            for (int y = 0; y < Height; y++)
+            {
+                for (int x = 0; x < Width; x++)
+                {
+                    if (GetAt(x, y) == c)
+                    {
+                        result.Add(new Position(x, y));
+                    }
+                }
+            }
+            return result;
+        }
+
+
         public void ReplaceAll(char c, char newValue)
         {
             for (int y = 0; y < Height; y++)

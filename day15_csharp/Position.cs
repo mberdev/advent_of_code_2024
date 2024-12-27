@@ -44,6 +44,18 @@ namespace ConsoleApp
         {
             return new Position(X - v.X, Y - v.Y);
         }
+
+        public Position RelativePosition(Direction d)
+        {
+            return d switch
+            {
+                Direction.Up => new Position(X, Y - 1),
+                Direction.Down => new Position(X, Y + 1),
+                Direction.Left => new Position(X - 1, Y),
+                Direction.Right => new Position(X + 1, Y),
+                _ => throw new Exception("Invalid direction")
+            };
+        }
     }
 
 
