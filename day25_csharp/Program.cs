@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using ConsoleApp;
 
 
@@ -18,16 +19,37 @@ else
 // Control
 //Console.WriteLine(data);
 
-(var grid, var moves) = InputParser.ParseInput(lines);
+(var keys, var locks) = InputParser.ParseInput(lines);
 
+part1(keys, locks);
 
-
-
-//part1(grid, robot, moves);
-
-void part1()
+void part1(List<LockOrKey> keys, List<LockOrKey> locks)
 {
+    int count = 0;
 
+    foreach(var lok in locks) {
+        foreach (var key in keys)
+        {
+            int i = 0;
+            bool fits = true;
+            while (i < 5)
+            {
+                if (lok.Values[i] + key.Values[i] > 5)
+                {
+                    fits = false;
+                    break;
+                }
+                i++;
+            }
+
+            if(fits)
+            {
+                count++;
+            }
+        }
+    }
+
+    Console.WriteLine("Total fits:" + count);
 }
 
 Console.WriteLine("Done.");
