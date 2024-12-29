@@ -10,9 +10,9 @@ namespace ConsoleApp
     public class InputParser
     {
 
-        public static Dictionary<string, string> ParseInput(string[] lines)
+        public static Dictionary<string, HashSet<string>> ParseInput(string[] lines)
         {
-            Dictionary<string, string> parsed = new();
+            Dictionary<string, HashSet<string>> parsed = new();
             foreach (var line in lines)
             {
                 if(string.IsNullOrEmpty(line))
@@ -23,8 +23,15 @@ namespace ConsoleApp
                 var parts = line.Split("-");
                 var key = parts[0];
                 var value = parts[1];
-                //Console.WriteLine($"Key: {key}, Value: {value}");
-                parsed.Add(key, value); 
+
+                if (parsed.ContainsKey(key))
+                {
+                    parsed[key].Add(value);
+                }
+                else
+                {
+                    parsed.Add(key, new HashSet<string> { value });
+                }
             }
             return parsed;
         }

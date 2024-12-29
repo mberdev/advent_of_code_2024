@@ -4,7 +4,7 @@ using ConsoleApp;
 
 
 
-var filePath = "./input_data/test_input1.txt";
+var filePath = "./input_data/input.txt";
 string[] lines;
 if (System.IO.File.Exists(filePath))
 {
@@ -23,9 +23,25 @@ var d = InputParser.ParseInput(lines);
 
 part1(d);
 
-void part1(Dictionary<string, string> data)
+void part1(Dictionary<string, HashSet<string>> d)
 {
+    var lan = new Lan(d);
+    var allTriplets = new HashSet<Triplet>();
+    foreach (var k in d.Keys)
+    {
+        var newTripets = lan.FindTriplets(k);
+        foreach (var t in newTripets)
+        {
+            allTriplets.Add(t);
+        }
+    }
 
+    //foreach (var t in allTriplets)
+    //{
+    //    Console.WriteLine(string.Join(",", t));
+    //}
+
+    Console.WriteLine("Start with t: " + allTriplets.Count(t => t.hasStartsWithT())); 
 }
 
 Console.WriteLine("Done.");
