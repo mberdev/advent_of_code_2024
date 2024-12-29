@@ -21,12 +21,13 @@ else
 
 var d = InputParser.ParseInput(lines);
 
-part1(d);
+//part1(d);
+part2(d);
 
 void part1(Dictionary<string, HashSet<string>> d)
 {
     var lan = new Lan(d);
-    var allTriplets = new HashSet<Triplet>();
+    var allTriplets = new HashSet<NSet>();
     foreach (var k in d.Keys)
     {
         var newTripets = lan.FindTriplets(k);
@@ -42,6 +43,24 @@ void part1(Dictionary<string, HashSet<string>> d)
     //}
 
     Console.WriteLine("Start with t: " + allTriplets.Count(t => t.hasStartsWithT())); 
+}
+
+void part2(Dictionary<string, HashSet<string>> d)
+{
+    var lan = new Lan(d);
+    var allSets = new HashSet<NSet>();
+    foreach (var k in d.Keys)
+    {
+        var set = lan.FindNSet(k);
+        allSets.Add(set);
+        //Console.WriteLine($"{k}: " + set);
+    }
+
+    var longest = allSets.OrderByDescending(s => s.Count).First();
+    Console.WriteLine("Most computers: " + longest);
+
+
+    //Console.WriteLine("Start with t: " + allSets.Count(t => t.hasStartsWithT()));
 }
 
 Console.WriteLine("Done.");

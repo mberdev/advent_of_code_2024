@@ -9,7 +9,7 @@ namespace ConsoleApp
 {
 
 
-    public class Triplet : SortedSet<string>
+    public class NSet : SortedSet<string>
     {
         public override string ToString()
         {
@@ -107,9 +107,9 @@ namespace ConsoleApp
         //    }
         //}
 
-        public HashSet<Triplet> FindTriplets(string s)
+        public HashSet<NSet> FindTriplets(string s)
         {
-            var result = new HashSet<Triplet>();
+            var result = new HashSet<NSet>();
             var first = s;
             foreach (var second in d1[s])
             {
@@ -118,11 +118,43 @@ namespace ConsoleApp
                 {
                     if (d1[third].Contains(first))
                     {
-                        result.Add(new Triplet() { first, second, third });
+                        result.Add(new NSet() { first, second, third });
                     }
                 }
             }
             return result;
+        }
+
+        public NSet FindNSet(string s)
+        {
+            var result = new NSet() { s };
+            var explored = new SortedSet<string>();
+
+            FindNSets(result, explored, s);
+
+            return result;
+        }
+
+
+
+        private void FindNSets(NSet h, SortedSet<string> explored, string current)
+        {
+            if (explored.Contains(current))
+            {
+                return;
+            }
+
+            explored.Add(current);
+
+            var connections = d1[current];
+            if (h.Any(inSet => inSet != current && !connections.Contains(inSet)))
+                return;
+
+            h.Add(current);
+            foreach(var connection in connections)
+            {
+                FindNSets(h, explored, connection);
+            }
         }
     }
 }
