@@ -9,33 +9,36 @@ namespace ConsoleApp
 {
 
 
-    public record Triplet
+    public class Triplet : SortedSet<string>
     {
-        public Triplet(HashSet<string> values)
-        {
-            if(values.Count != 3)
-            {
-                throw new ArgumentException("Triplet must contain exactly 3 values.");
-            }
-
-            var sortedValues = values.OrderBy(x => x).ToList();
-            First = sortedValues[0];
-            Second = sortedValues[1];
-            Third = sortedValues[2];
-        }
-
-        public string First { get; }
-        public string Second { get; }
-        public string Third { get; }
-
         public override string ToString()
         {
-            return $"{First},{Second},{Third}";
+            return string.Join(",", this);
         }
 
         public bool hasStartsWithT()
         {
-            return First.StartsWith("t") || Second.StartsWith("t") || Third.StartsWith("t");
+            return this.Any(x => x.StartsWith("t"));
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is SortedSet<string> otherSet)
+            {
+                return this.SetEquals(otherSet);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            foreach (var item in this)
+            {
+                hash ^= item?.GetHashCode() ?? 0;
+            }
+            return hash;
         }
     }
 
@@ -115,8 +118,7 @@ namespace ConsoleApp
                 {
                     if (d1[third].Contains(first))
                     {
-                        var items = new HashSet<string>() { first, second, third };
-                        result.Add(new Triplet(items));
+                        result.Add(new Triplet() { first, second, third });
                     }
                 }
             }
